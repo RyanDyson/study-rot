@@ -1,10 +1,40 @@
 import Link from "next/link";
 import { Navbar } from "@/components/global/navbar";
-import { getSession } from "@/server/better-auth/server";
 import { HydrateClient } from "@/trpc/server";
 import { Dither } from "@/components/Dither";
 import { Sparkles } from "lucide-react";
 import { Iphone } from "@/components/ui/iphone";
+import { ThreadTweetCard } from "@/app/(protected)/dashboard/threads/[threadId]/thread-tweet-card";
+import { type Thread } from "@/server/api/router/threadRouter";
+
+const SAMPLE_THREAD: Thread[] = [
+  {
+    id: "s1",
+    author: "ConceptBot",
+    handle: "@ConceptBot",
+    content:
+      'Hot take: "Overfitting is just your model trying really hard." 🔥',
+    likes: 412,
+  },
+  {
+    id: "s2",
+    author: "ExplainAI",
+    handle: "@ExplainAI",
+    content:
+      "Not quite. Overfitting means your model memorizes the training data and fails on new data. Let's walk through an example 👇",
+    likes: 891,
+    replies: [
+      {
+        id: "s2-r1",
+        author: "MythBuster",
+        handle: "@MythBuster",
+        content:
+          'Misconception: "More parameters always = better model." This is where regularization and validation sets come in…',
+        likes: 203,
+      },
+    ],
+  },
+];
 
 export default async function Home() {
   //const session = await getSession();
@@ -45,44 +75,49 @@ export default async function Home() {
               </Link>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">
-              <Iphone className="w-md" />
+              <Iphone src="/preview.jpeg" className="w-md object-scale-down" />
             </div>
           </section>
 
-          <section className="grid gap-6 md:grid-cols-3">
-            <div className="group rounded-2xl border border-zinc-700/60 bg-zinc-900/40 p-6 backdrop-blur-md transition-all duration-300 hover:border-zinc-600/80 hover:bg-zinc-900/60 hover:shadow-xl hover:shadow-black/10">
-              <div className="mb-3 h-8 w-8 rounded-lg bg-primary/20" />
-              <h2 className="mb-2 text-sm font-semibold tracking-tight text-white">
-                Chunked concepts
-              </h2>
-              <p className="text-sm leading-relaxed text-zinc-400">
-                Break big topics into small, tweet-sized ideas with clear
-                progress so learners never feel lost or overwhelmed.
-              </p>
-            </div>
-            <div className="group rounded-2xl border border-zinc-700/60 bg-zinc-900/40 p-6 backdrop-blur-md transition-all duration-300 hover:border-zinc-600/80 hover:bg-zinc-900/60 hover:shadow-xl hover:shadow-black/10">
-              <div className="mb-3 h-8 w-8 rounded-lg bg-chart-3/20" />
-              <h2 className="mb-2 text-sm font-semibold tracking-tight text-white">
-                Knowledge base uploads
-              </h2>
-              <p className="text-sm leading-relaxed text-zinc-400">
-                Feed PPTs, PDFs, and docs into your private knowledge base. We
-                summarize, chunk, generate embeddings, and store them for
-                RAG-powered threads.
-              </p>
-            </div>
-            <div className="group rounded-2xl border border-zinc-700/60 bg-zinc-900/40 p-6 backdrop-blur-md transition-all duration-300 hover:border-zinc-600/80 hover:bg-zinc-900/60 hover:shadow-xl hover:shadow-black/10">
-              <div className="mb-3 h-8 w-8 rounded-lg bg-chart-2/20" />
-              <h2 className="mb-2 text-sm font-semibold tracking-tight text-white">
-                Checkpoints & leaderboards
-              </h2>
-              <p className="text-sm leading-relaxed text-zinc-400">
-                Swipe through checkpoints like Tinder, compete on leaderboards,
-                and track how deep you&apos;ve explored each topic.
-              </p>
-            </div>
+          {/* ── feature cards ───────────────────────────────────────── */}
+          <section className="grid gap-4 md:grid-cols-3">
+            {[
+              {
+                accent: "bg-primary/20",
+                title: "Chunked concepts",
+                body: "Break big topics into small, tweet-sized ideas with clear progress so learners never feel lost or overwhelmed.",
+              },
+              {
+                accent: "bg-chart-3/20",
+                title: "Knowledge base uploads",
+                body: "Feed PPTs, PDFs, and docs into your private knowledge base. We summarize, chunk, and store them for RAG-powered threads.",
+              },
+              {
+                accent: "bg-chart-2/20",
+                title: "Checkpoints & leaderboards",
+                body: "Swipe through checkpoints like Tinder, compete on leaderboards, and track how deep you've explored each topic.",
+              },
+            ].map(({ accent, title, body }) => (
+              <div
+                key={title}
+                className="group relative overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/30 p-6 backdrop-blur-md transition-all duration-300 hover:border-zinc-700 hover:bg-zinc-900/50"
+              >
+                {/* subtle top-left glow */}
+                <div
+                  className={`absolute -left-4 -top-4 h-20 w-20 rounded-full blur-2xl opacity-40 ${accent}`}
+                />
+                <div
+                  className={`relative mb-4 h-8 w-8 rounded-lg ${accent} ring-1 ring-white/5`}
+                />
+                <h2 className="mb-2 text-sm font-semibold tracking-tight text-white">
+                  {title}
+                </h2>
+                <p className="text-sm leading-relaxed text-zinc-400">{body}</p>
+              </div>
+            ))}
           </section>
 
+          {/* ── story section ────────────────────────────────────────── */}
           <section className="grid gap-12 md:grid-cols-[1.2fr,1fr] md:items-center">
             <div className="space-y-5">
               <h2 className="font-serif text-2xl font-normal tracking-tight text-white md:text-3xl">
@@ -101,49 +136,20 @@ export default async function Home() {
                 scroll through.
               </p>
             </div>
-            <div className="rounded-2xl border border-zinc-700/60 bg-zinc-900/50 p-6 shadow-2xl shadow-black/20 backdrop-blur-md">
-              <p className="mb-4 text-[10px] font-semibold uppercase tracking-widest text-primary">
+
+            {/* mock thread card */}
+            <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 shadow-2xl shadow-black/30 backdrop-blur-md overflow-hidden">
+              <p className="px-5 pt-5 pb-2 text-[10px] font-semibold uppercase tracking-widest text-primary/70">
                 Sample thread snapshot
               </p>
-              <div className="space-y-3">
-                <div className="flex gap-3 rounded-sm border border-zinc-700/40 bg-zinc-800/60 p-4">
-                  <div className="h-8 w-8 shrink-0 rounded-full bg-primary/30" />
-                  <div>
-                    <p className="text-xs font-semibold text-primary">
-                      @ConceptBot
-                    </p>
-                    <p className="mt-1 text-xs leading-relaxed text-zinc-300">
-                      Hot take: &quot;Overfitting is just your model trying
-                      really hard.&quot; 🔥
-                    </p>
-                  </div>
-                </div>
-                <div className="flex gap-3 rounded-sm border border-zinc-700/40 bg-zinc-800/60 p-4">
-                  <div className="h-8 w-8 shrink-0 rounded-full bg-chart-3/30" />
-                  <div>
-                    <p className="text-xs font-semibold text-chart-3">
-                      @ExplainAI
-                    </p>
-                    <p className="mt-1 text-xs leading-relaxed text-zinc-300">
-                      Not quite. Overfitting means your model memorizes the
-                      training data and fails on new data. Let&apos;s walk
-                      through an example 👇
-                    </p>
-                  </div>
-                </div>
-                <div className="flex gap-3 rounded-sm border border-zinc-700/40 bg-zinc-800/60 p-4">
-                  <div className="h-8 w-8 shrink-0 rounded-full bg-destructive/30" />
-                  <div>
-                    <p className="text-xs font-semibold text-destructive">
-                      @MythBuster
-                    </p>
-                    <p className="mt-1 text-xs leading-relaxed text-zinc-300">
-                      Misconception: &quot;More parameters always = better
-                      model.&quot; This is where regularization and validation
-                      sets come in…
-                    </p>
-                  </div>
-                </div>
+              <div className="divide-y divide-border">
+                {SAMPLE_THREAD.map((tweet, index) => (
+                  <ThreadTweetCard
+                    key={tweet.id}
+                    tweet={tweet}
+                    showConnector={index < SAMPLE_THREAD.length - 1}
+                  />
+                ))}
               </div>
             </div>
           </section>

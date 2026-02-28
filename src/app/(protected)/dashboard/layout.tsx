@@ -1,5 +1,11 @@
+import { type Metadata } from "next";
 import { AppNavbar } from "@/components/global/sidebar";
 import { NavbarProvider } from "@/components/global/navbar-context";
+
+export const metadata: Metadata = {
+  title: "Dashboard",
+  description: "Manage your courses and generate AI-powered study threads.",
+};
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (

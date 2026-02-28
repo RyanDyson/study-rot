@@ -14,7 +14,6 @@ export default async function ThreadPage({ params }: PageProps) {
   if (!thread || thread.length === 0) notFound();
 
   const sortedTweets = [...thread].sort(() => Math.random() - 0.5);
-  console.log(sortedTweets);
 
   return (
     <div className="flex min-h-screen flex-col">
