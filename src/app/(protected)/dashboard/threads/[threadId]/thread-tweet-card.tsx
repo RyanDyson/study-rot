@@ -46,7 +46,7 @@ export function ThreadTweetCard({
             "bg-primary"
           )}
         >
-          {tweet.author.charAt(0)}
+          {tweet.author?.charAt(0)}
         </div>
         {(showConnector || (hasReplies && showReplies)) && (
           <div className="mt-1 w-0.5 flex-1 bg-border/60" />

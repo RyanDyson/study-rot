@@ -39,7 +39,8 @@ const sampleChats = [{
                 }]
             }] satisfies Thread[]
 
-const systemQuery = `Generate a twitter thread like conversation in JSON, follow the following structure ${sampleChats}`
+const systemQuery = `Generate a twitter thread like conversation in JSON, RETURN ONLY VALID JSON AND NOTHING ELSE, follow the following structure 
+${JSON.stringify({result: sampleChats})}`
 
 export const threadRouter = createTRPCRouter({
     getAllThreads: protectedProcedure
@@ -48,20 +49,32 @@ export const threadRouter = createTRPCRouter({
             const course = await db.query.knowledgeBase.findFirst({where: eq(knowledgeBase.id, input)})
             if (!course) throw new Error("Knowledge Base Not Found");
 
-            return sampleChats
-
             const documents = await db.query.knowledgeFiles.findMany({where: eq(knowledgeFiles.knowledgeBaseId, course.id)})
 
             const chats = [] as Thread[]
 
             for (const doc of documents) {
-                const newChat = await converseWithChatBedrock(
-                    doc.name,
-                    systemQuery,
-                    10
-                )
+                const obj = {
+                        query: systemQuery,
+                        collection_name: "collection",
+                        user_id: ctx.session.user.id,
+                        document_string: doc.name
+                    }
+                const newChat = await fetch("http://98.80.142.177:8000/chat_model", {
+                    method: "POST",
+                    headers: {
+                        "accept": "application/json",
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(obj)
+                })
+                .then(res => res.json())
+                .then(obj => {
+                    const res = obj.response.content
+                    return JSON.parse(res).result
+                })
 
-                chats.push(JSON.parse(newChat))
+                chats.push(...newChat)
             }
 
             return chats       

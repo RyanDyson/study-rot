@@ -15,7 +15,8 @@ export default async function ThreadPage({ params }: PageProps) {
 
   if (!thread) notFound();
 
-  const sortedTweets = thread
+  const sortedTweets = thread.sort(() => Math.random() - 0.5)
+  console.log(sortedTweets)
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -45,7 +46,7 @@ export default async function ThreadPage({ params }: PageProps) {
         <div className="mx-auto w-full max-w-2xl">
           <div className="divide-y divide-border">
             {sortedTweets.map((tweet, index) => (
-              <div key={tweet.id} className="relative">
+              <div key={JSON.stringify(tweet)} className="relative">
                 <ThreadTweetCard
                   tweet={tweet}
                   showConnector={index < sortedTweets.length - 1}
