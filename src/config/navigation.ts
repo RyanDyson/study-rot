@@ -1,7 +1,5 @@
 export const navigation = [
-  { label: "Products", href: "/dashboard" },
-  { label: "Upload", href: "/dashboard/upload" },
-  { label: "Features", href: "/#Features" },
-  { label: "Pricing", href: "/" },
-  { label: "About", href: "/" },
+  { label: "Home", href: "/" },
+  { label: "Dashboard", href: "/dashboard" },
+  { label: "Upload & generate", href: "/dashboard/upload" },
 ];
