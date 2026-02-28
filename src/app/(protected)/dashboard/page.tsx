@@ -4,7 +4,7 @@ import { Upload, MessageSquare, BookOpen, Plus } from "lucide-react";
 import { api } from "@/trpc/react";
 
 export default function Dashboard() {
-  const courses = api.knowledgeBase.getAll.useQuery();
+  // const courses = api.knowledgeBase.getAll.useQuery();
   return (
     <div className="flex flex-col gap-8 p-6 lg:p-8">
       <div className="flex flex-wrap items-center justify-between gap-4">

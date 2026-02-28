@@ -55,8 +55,9 @@ export async function POST(request: Request) {
   try {
     const formData = await request.formData()
     const file = formData.get("file")
+    const id = formData.get("id")
 
-    if (!file || !(file instanceof File)) {
+    if (!(file instanceof File)) {
       return Response.json(
         { error: "No file provided" },
         { status: 400 }
@@ -81,11 +82,7 @@ export async function POST(request: Request) {
     const buffer = Buffer.from(bytes)
     await writeFile(filepath, buffer)
 
-    return Response.json({
-      ok: true,
-      filename,
-      path: filepath,
-    })
+    return Response.json({ ok: true, filename })
   } catch (err) {
     console.error("Upload error:", err)
     return Response.json(

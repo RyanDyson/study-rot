@@ -6,29 +6,37 @@ import { and, eq } from "drizzle-orm";
 
 export const knowledgeBaseRouter = createTRPCRouter({
     create: protectedProcedure
-        .input(z.string())
+        .input(z.object({
+            title: z.string(),
+            description: z.string()
+        }))
         .mutation(async ({ctx, input}) => {
-            await db.insert(knowledgeBase).values({
-                name: input,
+            const res = await db.insert(knowledgeBase).values({
+                title: input.title,
+                description: input.description,
                 userId: ctx.session.user.id
-            })
+            }).returning()
+
+            return res[0]
         }),
     getAll: protectedProcedure
         .query(async ({ctx}) => await db.query.knowledgeBase.findMany({where: eq(knowledgeBase.userId, ctx.session.user.id)})),
     updateName: protectedProcedure
         .input(z.object({
             id: z.string(),
-            name: z.string()
+            title: z.string(),
+            description: z.string()
         }))
         .mutation(async ({ctx, input}) => {
             await db.update(knowledgeBase)
-                .set({name: input.name})
+                .set({title: input.title, description: input.description})
                 .where(
                     and(
                         eq(knowledgeBase.userId, ctx.session.user.id),
                         eq(knowledgeBase.id, input.id)
                     )
                 )
+                .returning()
         }),
     uploadFiles: protectedProcedure
         .input(z.object({
