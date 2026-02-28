@@ -135,17 +135,10 @@ export function ThreadTweetCard({
           </button>
         </div>
 
-        {tweet.likes > 0 && (
-          <div className="mt-2 text-xs text-muted-foreground">
-            {tweet.likes + (liked ? 1 : 0)}{" "}
-            {tweet.likes + (liked ? 1 : 0) === 1 ? "like" : "likes"}
-          </div>
-        )}
-
         {hasReplies && tweet.replyCount && tweet.replyCount > 0 && (
           <button
             onClick={() => setShowReplies(!showReplies)}
-            className="mt-2 text-xs text-muted-foreground hover:text-foreground transition"
+            className="cursor-pointer mt-2 text-xs text-muted-foreground hover:text-foreground transition"
           >
             {showReplies ? "Hide" : "View"} {tweet.replyCount}{" "}
             {tweet.replyCount === 1 ? "reply" : "replies"}
