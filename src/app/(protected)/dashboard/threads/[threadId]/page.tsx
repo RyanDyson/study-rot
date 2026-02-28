@@ -17,53 +17,53 @@ export default async function ThreadPage({ params }: PageProps) {
   const sortedTweets = [...thread.tweets].sort((a, b) => a.order - b.order);
 
   return (
-    <div className="flex flex-col gap-8 p-6 lg:p-8">
-      <div className="flex flex-col gap-4">
-        <Link
-          href="/dashboard"
-          className="inline-flex h-7 w-fit items-center gap-1.5 rounded-full px-2.5 text-[0.8rem] font-medium text-muted-foreground transition hover:bg-accent hover:text-foreground"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to dashboard
-        </Link>
-        <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/20 text-primary">
-            <MessageCircle className="h-6 w-6" />
-          </div>
-          <div>
-            <h1 className="text-xl font-semibold text-foreground md:text-2xl">
-              {thread.title}
-            </h1>
-            <p className="text-sm text-muted-foreground">{thread.topic}</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="mx-auto w-full max-w-[36rem]">
-        <div className="flex flex-col gap-0 rounded-2xl border border-border bg-card shadow-xl">
-          {sortedTweets.map((tweet, index) => (
-            <div key={tweet.id}>
-              <ThreadTweetCard
-                tweet={tweet}
-                isFirst={index === 0}
-                isLast={index === sortedTweets.length - 1}
-                connector={index < sortedTweets.length - 1}
-              />
-              {index < sortedTweets.length - 1 && (
-                <div className="ml-6 h-4 w-px bg-border" aria-hidden />
-              )}
+    <div className="flex min-h-screen flex-col">
+      <div className="sticky top-0 z-10 border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
+        <div className="flex items-center gap-4 p-4">
+          <Link
+            href="/dashboard"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full text-foreground transition hover:bg-accent"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Link>
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <MessageCircle className="h-5 w-5" />
             </div>
-          ))}
+            <div>
+              <h1 className="text-base font-semibold text-foreground">
+                {thread.title}
+              </h1>
+              <p className="text-sm text-muted-foreground">{thread.topic}</p>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="flex justify-center gap-4 border-t border-border pt-6">
-        <Link
-          href="/dashboard/upload"
-          className="inline-flex h-7 items-center rounded-full px-2.5 text-[0.8rem] font-medium text-muted-foreground transition hover:bg-accent hover:text-foreground"
-        >
-          Upload & generate another
-        </Link>
+      <div className="flex-1 pb-20">
+        <div className="mx-auto w-full max-w-2xl">
+          <div className="divide-y divide-border">
+            {sortedTweets.map((tweet, index) => (
+              <div key={tweet.id} className="relative">
+                <ThreadTweetCard
+                  tweet={tweet}
+                  showConnector={index < sortedTweets.length - 1}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="fixed bottom-0 left-0 right-0 border-t border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
+        <div className="mx-auto flex max-w-2xl items-center justify-center gap-4 p-4">
+          <Link
+            href="/dashboard/upload"
+            className="inline-flex h-9 items-center rounded-full px-4 text-sm font-medium text-muted-foreground transition hover:bg-accent hover:text-foreground"
+          >
+            Upload & generate another thread
+          </Link>
+        </div>
       </div>
     </div>
   );

@@ -29,7 +29,7 @@ export default function Dashboard() {
             key={course.id}
             className="flex flex-col rounded-2xl border border-border bg-card p-5 backdrop-blur transition hover:border-border hover:bg-accent/50"
           >
-            <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-sm bg-primary/20 text-primary">
+            <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-primary/20 text-primary">
               <BookOpen className="h-5 w-5" />
             </div>
             <h2 className="mb-1 font-semibold text-foreground">
