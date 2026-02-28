@@ -83,7 +83,7 @@ export const knowledgeBase = pgTable("knowledge_base", {
   userId: text("user_id").notNull().references(() => user.id, {onDelete: "cascade"})
 });
 
-export const knowledgeFiles = pgTable("knowledgeFiles", {
+export const knowledgeFiles = pgTable("knowledge_files", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
   createdAt: timestamp("created_at").$defaultFn(

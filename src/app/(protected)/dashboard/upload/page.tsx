@@ -1,105 +1,61 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Pattern as TableUpload } from "@/components/patterns/p-file-upload-6";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Sparkles } from "lucide-react";
 import type { FileMetadata, FileWithPreview } from "@/hooks/use-file-upload";
 import { api } from "@/trpc/react";
 
-type OcrStatus = "pending" | "processing" | "completed" | "failed";
-
-interface TrackedFile {
-  fileId: string;
-  name: string;
-  ocrStatus: OcrStatus;
+async function uploadFile(fileWithPreview: FileWithPreview, id: string) {
+  const file = fileWithPreview.file;
+  if (!(file instanceof File)) return;
+  const formData = new FormData();
+  formData.append("id", id);
+  formData.append("file", file);
+  const res = await fetch("/api/upload", { method: "POST", body: formData });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error ?? "Upload failed");
+  }
+  return res.json();
 }
 
 export default function DashboardUploadPage() {
-  const searchParams = useSearchParams();
-  const courseId = searchParams.get("courseId") ?? "default";
-  const kbName = `kb-${courseId}`;
+  const filesRef = useRef<FileWithPreview[]>([]);
 
-  const [initialFiles, setInitialFiles] = useState<FileMetadata[]>([]);
-  const [hasFetched, setHasFetched] = useState(false);
-  const [knowledgeBaseId, setKnowledgeBaseId] = useState<string | null>(null);
-  const [trackedFiles, setTrackedFiles] = useState<TrackedFile[]>([]);
+  const [courseName, setCourseName] = useState("");
+  const [courseDescription, setCourseDescription] = useState("");
 
-  const getOrCreate = api.knowledgeBase.getOrCreate.useMutation({
-    onSuccess: (data) => setKnowledgeBaseId(data.id),
-  });
+  const { mutateAsync } = api.knowledgeBase.create.useMutation();
 
-  useEffect(() => {
-    getOrCreate.mutate({ name: kbName });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [kbName]);
+  const handleFilesChange = (files: FileWithPreview[]) => {
+    filesRef.current = files;
+  };
 
-  useEffect(() => {
-    fetch("/api/upload")
-      .then((res) => (res.ok ? res.json() : { files: [] }))
-      .then((data) => {
-        setInitialFiles((data as { files: FileMetadata[] }).files ?? []);
-        setHasFetched(true);
-      })
-      .catch(() => setHasFetched(true));
-  }, []);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  const pendingFileId = trackedFiles.find(
-    (f) => f.ocrStatus === "pending" || f.ocrStatus === "processing",
-  )?.fileId;
-
-  const fileStatusQuery = api.knowledgeBase.getFileStatus.useQuery(
-    pendingFileId ?? "",
-    {
-      enabled: !!pendingFileId,
-      refetchInterval: 2000,
-    },
-  );
-
-  useEffect(() => {
-    if (fileStatusQuery.data) {
-      const updated = fileStatusQuery.data;
-      setTrackedFiles((prev) =>
-        prev.map((f) =>
-          f.fileId === updated.id ? { ...f, ocrStatus: updated.ocrStatus as OcrStatus } : f,
-        ),
-      );
-    }
-  }, [fileStatusQuery.data]);
-
-  const getExtractedTexts = api.knowledgeBase.getExtractedTexts.useQuery(
-    knowledgeBaseId ?? "",
-    { enabled: false },
-  );
-
-  const handleFilesAdded = (files: FileWithPreview[]) => {
-    if (!knowledgeBaseId) return;
-    void Promise.allSettled(
-      files.map(async (fileWithPreview) => {
-        const file = fileWithPreview.file;
-        if (!(file instanceof File)) return;
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("knowledgeBaseId", knowledgeBaseId);
-        const res = await fetch("/api/upload", { method: "POST", body: formData });
-        if (!res.ok) {
-          const data = (await res.json().catch(() => ({}))) as { error?: string };
-          throw new Error(data.error ?? "Upload failed");
-        }
-        const data = (await res.json()) as { fileId?: string };
-        if (data.fileId) {
-          setTrackedFiles((prev) => [
-            ...prev,
-            { fileId: data.fileId!, name: file.name, ocrStatus: "pending" },
-          ]);
-        }
-      }),
-    ).then((results) => {
-      results.forEach((r, i) => {
-        if (r.status === "rejected") console.error(`Upload ${i} failed:`, r.reason);
-      });
+    const result = await mutateAsync({
+      title: courseName,
+      description: courseDescription,
     });
+
+    for (const fileWithPreview of filesRef.current) {
+      if (fileWithPreview.file instanceof File) {
+        await uploadFile(fileWithPreview, result.id);
+      }
+    }
   };
 
   const hasCompleted = trackedFiles.some((f) => f.ocrStatus === "completed");
@@ -120,49 +76,61 @@ export default function DashboardUploadPage() {
 
   return (
     <div className="flex flex-1 w-full flex-col items-center gap-6 p-6">
-      <section className="w-full max-w-2xl space-y-4">
-        <h2 className="text-lg font-medium">File upload</h2>
-        <div className="rounded-lg border bg-card p-6">
-          <TableUpload
-            key={hasFetched ? "ready" : "loading"}
-            maxFiles={10}
-            maxSize={50 * 1024 * 1024}
-            accept="*"
-            multiple
-            initialFiles={initialFiles}
-            simulateUpload
-            onFilesAdded={handleFilesAdded}
-            onFilesChange={(files) => {
-              console.log("Files changed:", files.length, files);
-            }}
-          />
-        </div>
-        {trackedFiles.length > 0 && (
-          <ul className="space-y-1 text-sm">
-            {trackedFiles.map((f) => (
-              <li key={f.fileId} className="flex items-center justify-between gap-2">
-                <span className="truncate text-muted-foreground">{f.name}</span>
-                <span
-                  className={
-                    f.ocrStatus === "completed"
-                      ? "text-green-600"
-                      : f.ocrStatus === "failed"
-                        ? "text-destructive"
-                        : "text-amber-500"
-                  }
-                >
-                  {statusLabel[f.ocrStatus]}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
-        <div className="flex justify-center">
-          <Button variant="outline" disabled={!hasCompleted} onClick={handleGenerate}>
-            <Sparkles className="mr-2 h-4 w-4" />
-            Generate Threads
-          </Button>
-        </div>
+      <section className="w-full max-w-2xl space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Create a new course</CardTitle>
+            <CardDescription>
+              Enter course details and upload your files to generate threads.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="courseName">Course Name</Label>
+                <Input
+                  id="courseName"
+                  type="text"
+                  placeholder="e.g. Intro to Machine Learning"
+                  value={courseName}
+                  onChange={(e) => setCourseName(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="courseDescription">Course Description</Label>
+                <Input
+                  id="courseDescription"
+                  type="text"
+                  placeholder="e.g. Overfitting, regularization, and validation"
+                  value={courseDescription}
+                  onChange={(e) => setCourseDescription(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Files</Label>
+                <div className="rounded-lg border bg-card p-6">
+                  <TableUpload
+                    maxFiles={10}
+                    maxSize={50 * 1024 * 1024}
+                    accept="*"
+                    multiple
+                    onFilesChange={handleFilesChange}
+                  />
+                </div>
+              </div>
+              <div className="flex justify-center">
+                <Button type="submit" variant="outline">
+                  <Sparkles className="mr-2 h-4 w-4" />
+                  Create Course
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+        
       </section>
     </div>
   );

@@ -1,4 +1,4 @@
-import { writeFile, mkdir, readdir, stat } from "fs/promises";
+import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 import { db } from "@/server/db";
 import { knowledgeFiles } from "@/server/db/schema";
@@ -28,44 +28,17 @@ function getMimeType(filename: string): string {
   return map[ext] ?? "application/octet-stream";
 }
 
-export async function GET() {
-  try {
-    await mkdir(TMP_UPLOAD_DIR, { recursive: true });
-    const entries = await readdir(TMP_UPLOAD_DIR, { withFileTypes: true });
-    const files = await Promise.all(
-      entries
-        .filter((e) => e.isFile())
-        .map(async (e) => {
-          const filepath = path.join(TMP_UPLOAD_DIR, e.name);
-          const st = await stat(filepath);
-          return {
-            id: e.name,
-            name: e.name,
-            size: st.size,
-            type: getMimeType(e.name),
-            url: "",
-          };
-        }),
-    );
-    return Response.json({ files });
-  } catch (err) {
-    console.error("List uploads error:", err);
-    return Response.json({ error: "Failed to list uploads" }, { status: 500 });
-  }
-}
-
 export async function POST(request: Request) {
   try {
-    const formData = await request.formData();
-    const file = formData.get("file");
-    const knowledgeBaseId = formData.get("knowledgeBaseId");
+    const formData = await request.formData()
+    const file = formData.get("file")
+    const id = formData.get("id")
 
-    if (!file || !(file instanceof File)) {
-      return Response.json({ error: "No file provided" }, { status: 400 });
-    }
-
-    if (!knowledgeBaseId || typeof knowledgeBaseId !== "string") {
-      return Response.json({ error: "No knowledgeBaseId provided" }, { status: 400 });
+    if (!(file instanceof File)) {
+      return Response.json(
+        { error: "No file provided" },
+        { status: 400 }
+      )
     }
 
     if (file.size > MAX_SIZE_BYTES) {
@@ -101,12 +74,7 @@ export async function POST(request: Request) {
 
     void runOcrForFile(inserted.id, filepath, file.name);
 
-    return Response.json({
-      ok: true,
-      filename,
-      path: filepath,
-      fileId: inserted.id,
-    });
+    return Response.json({ ok: true, filename })
   } catch (err) {
     console.error("Upload error:", err);
     return Response.json({ error: "Upload failed" }, { status: 500 });

@@ -1,3 +1,4 @@
+'use client'
 import Link from "next/link";
 import { mockCourses } from "@/lib/mock-data";
 import { Upload, MessageSquare, BookOpen, Plus } from "lucide-react";
