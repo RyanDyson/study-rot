@@ -36,7 +36,7 @@ export default function DashboardUploadPage() {
 
   const [courseName, setCourseName] = useState("");
   const [courseDescription, setCourseDescription] = useState("");
-
+  const [knowledgeBaseId, setKnowledgeBaseId] = useState<string | null>(null)
   const { mutateAsync } = api.knowledgeBase.create.useMutation();
 
   const handleFilesChange = (files: FileWithPreview[]) => {
@@ -50,15 +50,13 @@ export default function DashboardUploadPage() {
       title: courseName,
       description: courseDescription,
     });
-
+    setKnowledgeBaseId(result.id);
     for (const fileWithPreview of filesRef.current) {
       if (fileWithPreview.file instanceof File) {
         await uploadFile(fileWithPreview, result.id);
       }
     }
   };
-
-  const hasCompleted = trackedFiles.some((f) => f.ocrStatus === "completed");
 
   const handleGenerate = () => {
     if (!knowledgeBaseId) return;
