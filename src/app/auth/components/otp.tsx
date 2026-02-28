@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -21,28 +22,10 @@ import { cn } from "@/lib/utils";
 import { authClient } from "@/server/better-auth/client";
 import { toast } from "sonner";
 import { useAuthNavigation } from "./auth-context";
-import { Mode } from "@/config/auth";
 
-interface OTPProps {
-  email?: string;
-  onSuccess?: () => void;
-  onResend?: () => void;
-}
-
-export function OTP({ email, onSuccess, onResend }: OTPProps) {
-  const { setMode } = useAuthNavigation();
-  const [otpEmail, setOtpEmail] = useState(email || "");
-
-  // Check URL for email parameter
-  useEffect(() => {
-    if (typeof window !== "undefined" && !email) {
-      const params = new URLSearchParams(window.location.search);
-      const urlEmail = params.get("email");
-      if (urlEmail) {
-        setOtpEmail(urlEmail);
-      }
-    }
-  }, [email]);
+export function OTP() {
+  const { email } = useAuthNavigation();
+  const router = useRouter();
   const [otp, setOtp] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
@@ -58,24 +41,15 @@ export function OTP({ email, onSuccess, onResend }: OTPProps) {
     setIsLoading(true);
 
     try {
-      // Verify OTP - adjust this based on your Better Auth setup
-      // This is a placeholder - you'll need to implement the actual verification
-      // Better Auth email verification typically uses a token-based approach
-      const data = await authClient.verifyEmail({
-        query: {
-          token: otp,
-        },
+      const data = await authClient.twoFactor.verifyOtp({
+        code: otp,
       });
 
       if (data.error) {
         toast.error(data.error.message || "Invalid verification code");
       } else {
-        toast.success("Email verified successfully!");
-        onSuccess?.();
-        // Navigate to sign in after successful verification
-        setTimeout(() => {
-          setMode(Mode.LOGIN);
-        }, 1500);
+        toast.success("Verified successfully!");
+        router.push("/dashboard");
       }
     } catch (error) {
       toast.error("An error occurred. Please try again.");
@@ -86,36 +60,18 @@ export function OTP({ email, onSuccess, onResend }: OTPProps) {
   };
 
   const handleResend = async () => {
-    if (!otpEmail) {
-      toast.error("Email is required to resend code");
-      return;
-    }
-
     setIsResending(true);
 
     try {
-      // Resend OTP - adjust this based on your Better Auth setup
-      // Better Auth typically uses sendVerificationEmail or similar method
-      // This is a placeholder - implement based on your Better Auth configuration
-      const data = await authClient.sendVerificationEmail({
-        email: otpEmail,
-      });
+      const data = await authClient.twoFactor.sendOtp();
 
       if (data.error) {
         toast.error(data.error.message || "Failed to resend code");
       } else {
         toast.success("Verification code sent!");
-        onResend?.();
       }
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "An error occurred";
-      // If method doesn't exist, show helpful message
-      if (errorMessage.includes("does not exist")) {
-        toast.error("Please configure email verification in Better Auth");
-      } else {
-        toast.error("An error occurred. Please try again.");
-      }
+      toast.error("An error occurred. Please try again.");
       console.error(error);
     } finally {
       setIsResending(false);
@@ -126,12 +82,12 @@ export function OTP({ email, onSuccess, onResend }: OTPProps) {
     <Card className="w-full max-w-md">
       <CardHeader className="text-center">
         <CardTitle className={cn("text-3xl", dmSans.className)}>
-          Verify Your Email
+          Verify Your Identity
         </CardTitle>
         <CardDescription className="text-base">
           Enter the 6-digit code sent to{" "}
-          {otpEmail && (
-            <span className="font-semibold text-foreground">{otpEmail}</span>
+          {email && (
+            <span className="font-semibold text-foreground">{email}</span>
           )}
         </CardDescription>
       </CardHeader>
@@ -165,7 +121,7 @@ export function OTP({ email, onSuccess, onResend }: OTPProps) {
             size="lg"
             disabled={isLoading || otp.length !== 6}
           >
-            {isLoading ? "Verifying..." : "Verify Email"}
+            {isLoading ? "Verifying..." : "Verify"}
           </Button>
         </form>
       </CardContent>
@@ -175,7 +131,7 @@ export function OTP({ email, onSuccess, onResend }: OTPProps) {
           <button
             type="button"
             onClick={handleResend}
-            disabled={isResending || !otpEmail}
+            disabled={isResending}
             className="text-primary hover:underline font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isResending ? "Resending..." : "Resend code"}
