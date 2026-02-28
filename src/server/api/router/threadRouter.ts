@@ -84,14 +84,11 @@ export const threadRouter = createTRPCRouter({
         })
           .then((res) => res.json())
           .then((obj) => {
-            const raw: string = obj.response.content;
-            // Strip markdown code fences if the model ignores instructions
-            const cleaned = raw
-              .replace(/^```(?:json)?\s*/i, "")
-              .replace(/```\s*$/i, "")
-              .trim();
-            const parsed = JSON.parse(cleaned) as { result: Thread[] };
-            return parsed.result;
+            const res = obj.response;
+            console.log(res);
+            const parsed = JSON.parse(res);
+            // Handle both raw array responses and wrapped { result: [...] } objects
+            return Array.isArray(parsed) ? parsed : parsed.result;
           });
 
         chats.push(...newChat);
