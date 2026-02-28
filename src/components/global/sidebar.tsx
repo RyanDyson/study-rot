@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { authClient } from "@/server/better-auth/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useNavbarCenterState } from "@/components/global/navbar-context";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,6 +30,7 @@ export const AppNavbar = () => {
   const { data: session } = authClient.useSession();
   const pathname = usePathname();
   const router = useRouter();
+  const navbarCenter = useNavbarCenterState();
 
   const handleLogout = async () => {
     await authClient.signOut();
@@ -42,7 +44,7 @@ export const AppNavbar = () => {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
-      <div className="flex h-14 items-center gap-6 px-4 lg:px-6">
+      <div className="relative flex h-14 items-center gap-6 px-4 lg:px-6">
         {/* Brand */}
         {/* <Link href="/" className="flex items-center gap-2 group">
           <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary transition-transform group-hover:scale-105">
@@ -77,6 +79,22 @@ export const AppNavbar = () => {
             );
           })}
         </nav>
+
+        {/* Center slot — injected by pages via context */}
+        {navbarCenter && (
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+            <div className="flex flex-col items-center text-center">
+              <span className="text-sm font-semibold leading-tight text-foreground">
+                {navbarCenter.title}
+              </span>
+              {navbarCenter.description && (
+                <span className="max-w-xs truncate text-[11px] text-muted-foreground">
+                  {navbarCenter.description}
+                </span>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* User menu — pushed to the right */}
         <div className="ml-auto">

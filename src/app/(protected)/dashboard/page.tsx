@@ -1,28 +1,27 @@
 "use client";
 import { api } from "@/trpc/react";
 import { UploadDialog } from "@/components/global/upload-dialog";
-import {
-  CourseCard,
-  CourseCardSkeleton,
-} from "@/components/global/course-card";
+import { CourseCard, CourseCardSkeleton } from "@/components/global/course-card";
 
 export default function Dashboard() {
-  const {
-    data: courses,
-    isLoading,
-    refetch,
-  } = api.knowledgeBase.getAll.useQuery();
-  console.log(courses);
+  const { data: courses, isLoading, refetch } = api.knowledgeBase.getAll.useQuery();
 
   return (
     <div className="relative flex h-full flex-col gap-8 p-6 lg:p-8">
       <UploadDialog refetch={refetch} />
 
+      <div className="flex flex-col gap-1">
+        <h1 className="text-2xl font-serif font-semibold text-foreground">
+          Course dashboard
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          Upload a syllabus or open an existing thread to learn.
+        </p>
+      </div>
+
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {isLoading
-          ? Array.from({ length: 3 }).map((_, i) => (
-              <CourseCardSkeleton key={i} />
-            ))
+          ? Array.from({ length: 3 }).map((_, i) => <CourseCardSkeleton key={i} />)
           : courses?.map((course) => (
               <CourseCard
                 key={course.id}

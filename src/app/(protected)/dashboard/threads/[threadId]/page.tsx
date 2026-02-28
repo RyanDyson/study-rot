@@ -11,9 +11,10 @@ export default async function ThreadPage({ params }: PageProps) {
   const { threadId } = await params;
   const thread = await api.thread.getAllThreads(threadId);
 
-  if (!thread) notFound();
+  if (!thread || thread.length === 0) notFound();
 
-  const sortedTweets = thread.sort(() => Math.random() - 0.5);
+  const sortedTweets = [...thread].sort(() => Math.random() - 0.5);
+  console.log(sortedTweets);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -57,10 +58,10 @@ export default async function ThreadPage({ params }: PageProps) {
       <div className="fixed bottom-0 left-0 right-0 border-t border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
         <div className="mx-auto flex max-w-2xl items-center justify-center gap-4 p-4">
           <Link
-            href="/dashboard/upload"
+            href="/dashboard"
             className="inline-flex h-9 items-center rounded-full px-4 text-sm font-medium text-muted-foreground transition hover:bg-accent hover:text-foreground"
           >
-            Upload & generate another thread
+            Back to dashboard
           </Link>
         </div>
       </div>

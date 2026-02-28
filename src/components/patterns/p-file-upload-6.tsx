@@ -1,22 +1,18 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import Link from "next/link"
+import { useEffect, useState } from "react";
+import Link from "next/link";
 import {
   formatBytes,
   useFileUpload,
   type FileMetadata,
   type FileWithPreview,
-} from "@/hooks/use-file-upload"
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "@/components/reui/alert"
-import { Badge } from "@/components/reui/badge"
+} from "@/hooks/use-file-upload";
+import { Alert, AlertDescription, AlertTitle } from "@/components/reui/alert";
+import { Badge } from "@/components/reui/badge";
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -24,25 +20,38 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { ImageIcon, VideoIcon, HeadphonesIcon, FileTextIcon, FileSpreadsheetIcon, FileArchiveIcon, UploadIcon, CloudUploadIcon, Trash2Icon, DownloadIcon, RefreshCwIcon, CircleAlertIcon } from "lucide-react"
+} from "@/components/ui/table";
+import {
+  ImageIcon,
+  VideoIcon,
+  HeadphonesIcon,
+  FileTextIcon,
+  FileSpreadsheetIcon,
+  FileArchiveIcon,
+  UploadIcon,
+  CloudUploadIcon,
+  Trash2Icon,
+  DownloadIcon,
+  RefreshCwIcon,
+  CircleAlertIcon,
+} from "lucide-react";
 
 interface FileUploadItem extends FileWithPreview {
-  progress: number
-  status: "uploading" | "completed" | "error"
-  error?: string
+  progress: number;
+  status: "uploading" | "completed" | "error";
+  error?: string;
 }
 
 interface TableUploadProps {
-  maxFiles?: number
-  maxSize?: number
-  accept?: string
-  multiple?: boolean
-  className?: string
-  initialFiles?: FileMetadata[]
-  onFilesChange?: (files: FileWithPreview[]) => void
-  onFilesAdded?: (files: FileWithPreview[]) => void
-  simulateUpload?: boolean
+  maxFiles?: number;
+  maxSize?: number;
+  accept?: string;
+  multiple?: boolean;
+  className?: string;
+  initialFiles?: FileMetadata[];
+  onFilesChange?: (files: FileWithPreview[]) => void;
+  onFilesAdded?: (files: FileWithPreview[]) => void;
+  simulateUpload?: boolean;
 }
 
 export function Pattern({
@@ -62,8 +71,9 @@ export function Pattern({
     preview: file.url,
     progress: 100,
     status: "completed" as const,
-  }))
-  const [uploadFiles, setUploadFiles] = useState<FileUploadItem[]>(defaultUploadItems)
+  }));
+  const [uploadFiles, setUploadFiles] =
+    useState<FileUploadItem[]>(defaultUploadItems);
 
   const [
     { isDragging, errors },
@@ -89,44 +99,44 @@ export function Pattern({
       const newUploadFiles = newFiles.map((file) => {
         // Check if this file already exists in uploadFiles
         const existingFile = uploadFiles.find(
-          (existing) => existing.id === file.id
-        )
+          (existing) => existing.id === file.id,
+        );
 
         if (existingFile) {
           // Preserve existing file status and progress
           return {
             ...existingFile,
             ...file, // Update any changed properties from the file
-          }
+          };
         } else {
           // New file - set to uploading
           return {
             ...file,
             progress: 0,
             status: "uploading" as const,
-          }
+          };
         }
-      })
-      setUploadFiles(newUploadFiles)
-      onFilesChange?.(newFiles)
+      });
+      setUploadFiles(newUploadFiles);
+      onFilesChange?.(newFiles);
     },
-  })
+  });
 
   // Simulate upload progress
   useEffect(() => {
-    if (!simulateUpload) return
+    if (!simulateUpload) return;
 
     const interval = setInterval(() => {
       setUploadFiles((prev) =>
         prev.map((file) => {
-          if (file.status !== "uploading") return file
+          if (file.status !== "uploading") return file;
 
-          const increment = Math.random() * 15 + 5 // 5-20% increment
-          const newProgress = Math.min(file.progress + increment, 100)
+          const increment = Math.random() * 15 + 5; // 5-20% increment
+          const newProgress = Math.min(file.progress + increment, 100);
 
           if (newProgress >= 100) {
             // Randomly decide if upload succeeds or fails
-            const shouldFail = Math.random() < 0.1 // 10% chance to fail
+            const shouldFail = Math.random() < 0.1; // 10% chance to fail
             return {
               ...file,
               progress: 100,
@@ -134,21 +144,21 @@ export function Pattern({
               error: shouldFail
                 ? "Upload failed. Please try again."
                 : undefined,
-            }
+            };
           }
 
-          return { ...file, progress: newProgress }
-        })
-      )
-    }, 500)
+          return { ...file, progress: newProgress };
+        }),
+      );
+    }, 500);
 
-    return () => clearInterval(interval)
-  }, [simulateUpload])
+    return () => clearInterval(interval);
+  }, [simulateUpload]);
 
   const removeUploadFile = (fileId: string) => {
-    setUploadFiles((prev) => prev.filter((file) => file.id !== fileId))
-    removeFile(fileId)
-  }
+    setUploadFiles((prev) => prev.filter((file) => file.id !== fileId));
+    removeFile(fileId);
+  };
 
   const retryUpload = (fileId: string) => {
     setUploadFiles((prev) =>
@@ -160,59 +170,39 @@ export function Pattern({
               status: "uploading" as const,
               error: undefined,
             }
-          : file
-      )
-    )
-  }
+          : file,
+      ),
+    );
+  };
 
   const getFileIcon = (file: File | FileMetadata) => {
-    const type = file instanceof File ? file.type : file.type
-    if (type.startsWith("image/"))
-      return (
-        <ImageIcon className="size-4" />
-      )
-    if (type.startsWith("video/"))
-      return (
-        <VideoIcon className="size-4" />
-      )
-    if (type.startsWith("audio/"))
-      return (
-        <HeadphonesIcon className="size-4" />
-      )
-    if (type.includes("pdf"))
-      return (
-        <FileTextIcon className="size-4" />
-      )
+    const type = file instanceof File ? file.type : file.type;
+    if (type.startsWith("image/")) return <ImageIcon className="size-4" />;
+    if (type.startsWith("video/")) return <VideoIcon className="size-4" />;
+    if (type.startsWith("audio/")) return <HeadphonesIcon className="size-4" />;
+    if (type.includes("pdf")) return <FileTextIcon className="size-4" />;
     if (type.includes("word") || type.includes("doc"))
-      return (
-        <FileTextIcon className="size-4" />
-      )
+      return <FileTextIcon className="size-4" />;
     if (type.includes("excel") || type.includes("sheet"))
-      return (
-        <FileSpreadsheetIcon className="size-4" />
-      )
+      return <FileSpreadsheetIcon className="size-4" />;
     if (type.includes("zip") || type.includes("rar"))
-      return (
-        <FileArchiveIcon className="size-4" />
-      )
-    return (
-      <FileTextIcon className="size-4" />
-    )
-  }
+      return <FileArchiveIcon className="size-4" />;
+    return <FileTextIcon className="size-4" />;
+  };
 
   const getFileTypeLabel = (file: File | FileMetadata) => {
-    const type = file instanceof File ? file.type : file.type
-    if (type.startsWith("image/")) return "Image"
-    if (type.startsWith("video/")) return "Video"
-    if (type.startsWith("audio/")) return "Audio"
-    if (type.includes("pdf")) return "PDF"
-    if (type.includes("word") || type.includes("doc")) return "Word"
-    if (type.includes("excel") || type.includes("sheet")) return "Excel"
-    if (type.includes("zip") || type.includes("rar")) return "Archive"
-    if (type.includes("json")) return "JSON"
-    if (type.includes("text")) return "Text"
-    return "File"
-  }
+    const type = file instanceof File ? file.type : file.type;
+    if (type.startsWith("image/")) return "Image";
+    if (type.startsWith("video/")) return "Video";
+    if (type.startsWith("audio/")) return "Audio";
+    if (type.includes("pdf")) return "PDF";
+    if (type.includes("word") || type.includes("doc")) return "Word";
+    if (type.includes("excel") || type.includes("sheet")) return "Excel";
+    if (type.includes("zip") || type.includes("rar")) return "Archive";
+    if (type.includes("json")) return "JSON";
+    if (type.includes("text")) return "Text";
+    return "File";
+  };
 
   return (
     <div className={cn("w-full space-y-4", className)}>
@@ -222,7 +212,7 @@ export function Pattern({
           "relative rounded-lg border border-dashed p-6 text-center transition-colors",
           isDragging
             ? "border-primary bg-primary/5"
-            : "border-muted-foreground/25 hover:border-muted-foreground/50"
+            : "border-muted-foreground/25 hover:border-muted-foreground/50",
         )}
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
@@ -231,7 +221,10 @@ export function Pattern({
       >
         <input {...getInputProps()} className="sr-only" />
 
-        <div className="flex flex-col items-center gap-4">
+        <div
+          className="flex flex-col items-center gap-4 cursor-pointer"
+          onClick={openFileDialog}
+        >
           <button
             type="button"
             onClick={openFileDialog}
@@ -239,7 +232,7 @@ export function Pattern({
               "bg-muted flex h-12 w-12 cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-muted/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
               isDragging
                 ? "border-primary bg-primary/10"
-                : "border-muted-foreground/25"
+                : "border-muted-foreground/25",
             )}
           >
             <UploadIcon className="text-muted-foreground h-5 w-5" />
@@ -248,11 +241,7 @@ export function Pattern({
           <div className="space-y-2">
             <p className="text-sm font-medium">
               Drop files here or{" "}
-              <button
-                type="button"
-                onClick={openFileDialog}
-                className="text-primary cursor-pointer underline-offset-4 hover:underline"
-              >
+              <button type="button" className="text-primary">
                 browse files
               </button>
             </p>
@@ -300,7 +289,7 @@ export function Pattern({
                       <div className="flex items-center gap-1">
                         <div
                           className={cn(
-                            "text-muted-foreground/80 relative flex size-8 shrink-0 items-center justify-center"
+                            "text-muted-foreground/80 relative flex size-8 shrink-0 items-center justify-center",
                           )}
                         >
                           {fileItem.status === "uploading" ? (
@@ -405,8 +394,7 @@ export function Pattern({
       {/* Error Messages */}
       {errors.length > 0 && (
         <Alert variant="destructive" className="mt-5">
-          <CircleAlertIcon
-          />
+          <CircleAlertIcon />
           <AlertTitle>File upload error(s)</AlertTitle>
           <AlertDescription>
             {errors.map((error, index) => (
@@ -418,5 +406,5 @@ export function Pattern({
         </Alert>
       )}
     </div>
-  )
+  );
 }
