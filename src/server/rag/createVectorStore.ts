@@ -7,6 +7,7 @@ import { BedrockEmbeddings } from "@langchain/aws";
 import { Document } from "@langchain/core/documents";
 import { PoolConfig } from "pg";
 import { v4 as uuidv4 } from "uuid";
+import { db } from "@/server/db";
 
 dotenv.config();
 
@@ -21,7 +22,7 @@ const embeddings = new BedrockEmbeddings({
   model: "amazon.titan-embed-text-v2:0",
 });
 
-export const generateVectorStore = async (file_name: string) => {
+export const generateVectorStore = async (user: string, file_name: string) => {
   const config = {
     postgresConnectionOptions: {
       connectionString: DATABASE_URL,
@@ -44,14 +45,14 @@ export const generateVectorStore = async (file_name: string) => {
   return vectorStore;
 };
 
-export const loadVectorStore = async (file_name: string) => {
+export const loadVectorStore = async (coursename_plus_user_id: string) => {
   const config = {
     postgresConnectionOptions: {
       connectionString: DATABASE_URL,
     } as PoolConfig,
     tableName: "vectors",
     collectionTableName: "collections",
-    collectionName: file_name,
+    collectionName: coursename_plus_user_id,
     columns: {
       idColumnName: "id",
       vectorColumnName: "vector",

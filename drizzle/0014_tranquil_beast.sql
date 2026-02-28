@@ -1,0 +1,1 @@
+ALTER TABLE "collections" ADD CONSTRAINT "collections_uuid_unique" UNIQUE("uuid");
