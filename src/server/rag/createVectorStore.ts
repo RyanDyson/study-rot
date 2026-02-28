@@ -3,13 +3,10 @@ import {
   PGVectorStore,
   DistanceStrategy,
 } from "@langchain/community/vectorstores/pgvector";
-import { BedrockEmbeddings, ChatBedrockConverse } from "@langchain/aws";
-// import { BedrockChat } from "@langchain/community";
-// import { OpenAIEmbeddings } from "@langchain/openai";
+import { BedrockEmbeddings } from "@langchain/aws";
 import { Document } from "@langchain/core/documents";
 import { PoolConfig } from "pg";
 import { v4 as uuidv4 } from "uuid";
-import postgres from "postgres";
 
 dotenv.config();
 
@@ -87,6 +84,8 @@ export const retrieveDocuments = async (
   if (!vectorStore) {
     throw new Error("Vector store is not initialized");
   }
-  const results = await vectorStore.similaritySearch(query, k);
+  const results = await vectorStore
+    .asRetriever({ k: k, searchType: "similarity" })
+    .invoke(query);
   return results;
 };
