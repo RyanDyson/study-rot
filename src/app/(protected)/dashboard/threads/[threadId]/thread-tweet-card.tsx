@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import type { ThreadTweet } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 import {
   Heart,
@@ -43,7 +42,7 @@ export function ThreadTweetCard({
         <div
           className={cn(
             "h-9 w-9 rounded-full flex items-center justify-center text-primary-foreground font-semibold text-xs shrink-0",
-            "bg-primary"
+            "bg-primary",
           )}
         >
           {tweet.author?.charAt(0)}

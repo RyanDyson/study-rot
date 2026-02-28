@@ -2,95 +2,125 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Menu } from "lucide-react";
-import { dmSans } from "@/lib/fonts";
+import { Menu, X, Zap } from "lucide-react";
 import { authClient } from "@/server/better-auth/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { navigation } from "@/config/navigation";
+import { cn } from "@/lib/utils";
 
 export const Navbar = () => {
   const { data: session } = authClient.useSession();
   const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <div className="fixed z-40 flex h-min w-screen justify-center p-4">
-      <div className="flex w-full items-center justify-center space-x-6 rounded-lg border-2 border-zinc-800 bg-zinc-900/70 px-4 py-2 text-zinc-50 backdrop-blur-lg md:w-fit md:rounded-full">
-        <div className="jusitfy-between hidden h-full space-x-2 md:flex md:space-x-4">
-          {navigation.map((nav, index) => (
-            <Link
-              href={nav.href}
-              key={index}
-              className="flex items-center justify-center rounded-full p-2 leading-none transition-colors duration-100 hover:text-zinc-300 active:bg-zinc-50 active:text-zinc-950"
-            >
-              {nav.label}
-            </Link>
-          ))}
-        </div>
-        <Separator orientation="vertical" className="h-full" />
-        {session ? (
-          <Link
-            href="/dashboard"
-            className="flex items-center justify-center mx-0"
-          >
-            <Button className="cursor-pointer flex items-center gap-x-2 min-h-fit min-w-fit py-2  rounded-full">
-              <Avatar>
-                <AvatarImage src={session.user?.image ?? ""} />
-                <AvatarFallback>{session.user?.name?.charAt(0)}</AvatarFallback>
-              </Avatar>
-              <span>Dashboard</span>
-            </Button>
-          </Link>
-        ) : (
-          <Link href="/auth" className="hidden md:flex">
-            <Button
-              variant="outline"
-              className="w-full rounded-full border-zinc-700 bg-zinc-800/50 hover:bg-zinc-700/50 hover:text-zinc-50"
-            >
-              Sign In
-            </Button>
-          </Link>
-        )}
-        <div className="ms-0 flex w-full flex-col md:hidden">
-          <div className="flex w-full items-center justify-between">
-            <span className={`${dmSans.className} italic`}>Your App Name</span>
-            <div className="flex items-center gap-x-4">
-              <button onClick={() => setIsOpen(!isOpen)}>
-                <Menu className="text-zinc-50" size={24} />
-              </button>
+    <div className="fixed inset-x-0 top-0 z-40 flex justify-center px-4 pt-4">
+      <nav className="w-full max-w-3xl overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/80 shadow-lg shadow-black/20 backdrop-blur-xl">
+        {/* ── desktop row ──────────────────────────────────────── */}
+        <div className="flex items-center justify-between gap-4 px-4 py-2.5">
+          {/* brand */}
+          <Link href="/" className="group flex items-center gap-2">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary transition-transform group-hover:scale-105 overflow-hidden">
+              <span
+                className="font-serif text-primary-foreground font-black leading-none select-none"
+                style={{
+                  fontSize: "1.1rem",
+                  transform: "skewX(-8deg) skewY(-4deg)",
+                  display: "inline-block",
+                  letterSpacing: "-0.05em",
+                }}
+              >
+                ✳
+              </span>
             </div>
+            <span className="text-sm font-serif font-semibold text-zinc-50">
+              StudyRot
+            </span>
+          </Link>
+
+          {/* nav links — desktop */}
+          <div className="hidden items-center gap-1 md:flex">
+            {navigation.map((nav) => (
+              <Link
+                key={nav.href}
+                href={nav.href}
+                className="rounded-lg px-3 py-1.5 text-sm text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-50"
+              >
+                {nav.label}
+              </Link>
+            ))}
           </div>
 
-          <div
-            className={`overflow-hidden transition-all duration-300 ease-in-out ${
-              isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
-            }`}
-            style={{ marginLeft: 0 }}
-          >
-            <div className="mb-4 mt-4 flex w-full flex-col justify-end gap-y-2 border-t border-zinc-600 pt-4">
-              {navigation.map((nav, index) => (
-                <Link
-                  href={nav.href}
-                  key={index}
-                  className="rounded-full p-2 leading-none transition-colors duration-100 hover:text-zinc-300 active:bg-zinc-50 active:text-zinc-950"
-                >
-                  {nav.label}
-                </Link>
-              ))}
-              {!session && (
-                <Link href="/auth" className="mt-2">
-                  <Button
-                    variant="outline"
-                    className="w-full rounded-full border-zinc-700 bg-zinc-800/50 hover:bg-zinc-700/50 hover:text-zinc-50"
-                  >
-                    Sign In
-                  </Button>
-                </Link>
+          {/* right side */}
+          <div className="flex items-center gap-2">
+            {session ? (
+              <Link
+                href="/dashboard"
+                className="flex items-center gap-2 rounded-xl border border-zinc-700 bg-zinc-800/60 px-3 py-1.5 text-sm font-medium text-zinc-50 transition-colors hover:bg-zinc-700/80"
+              >
+                <Avatar className="h-5 w-5">
+                  <AvatarImage src={session.user?.image ?? ""} />
+                  <AvatarFallback className="bg-primary text-[9px] font-semibold text-primary-foreground">
+                    {session.user?.name?.charAt(0)}
+                  </AvatarFallback>
+                </Avatar>
+                Dashboard
+              </Link>
+            ) : (
+              <Link
+                href="/auth"
+                className="hidden rounded-xl border border-zinc-700 bg-zinc-800/60 px-4 py-1.5 text-sm font-medium text-zinc-50 transition-colors hover:bg-zinc-700/80 md:block"
+              >
+                Sign in
+              </Link>
+            )}
+
+            {/* hamburger — mobile only */}
+            <button
+              onClick={() => setIsOpen((o) => !o)}
+              className="rounded-lg p-1.5 text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-50 md:hidden"
+              aria-label="Toggle menu"
+            >
+              {isOpen ? (
+                <X className="h-5 w-5" />
+              ) : (
+                <Menu className="h-5 w-5" />
               )}
-            </div>
+            </button>
           </div>
         </div>
-      </div>
+
+        {/* ── mobile menu ───────────────────────────────────────── */}
+        <div
+          className={cn(
+            "overflow-hidden border-t border-zinc-800 transition-all duration-300 ease-in-out md:hidden",
+            isOpen
+              ? "max-h-64 opacity-100"
+              : "max-h-0 opacity-0 border-transparent",
+          )}
+        >
+          <div className="flex flex-col gap-1 p-3">
+            {navigation.map((nav) => (
+              <Link
+                key={nav.href}
+                href={nav.href}
+                onClick={() => setIsOpen(false)}
+                className="rounded-lg px-3 py-2 text-sm text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-50"
+              >
+                {nav.label}
+              </Link>
+            ))}
+            {!session && (
+              <Link
+                href="/auth"
+                onClick={() => setIsOpen(false)}
+                className="mt-1 rounded-lg border border-zinc-700 px-3 py-2 text-center text-sm font-medium text-zinc-50 transition-colors hover:bg-zinc-800"
+              >
+                Sign in
+              </Link>
+            )}
+          </div>
+        </div>
+      </nav>
     </div>
   );
 };

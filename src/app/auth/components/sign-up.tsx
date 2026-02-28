@@ -12,12 +12,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { dmSans } from "@/lib/fonts";
-import { cn } from "@/lib/utils";
 import { authClient } from "@/server/better-auth/client";
 import { toast } from "sonner";
 import { useAuthNavigation } from "./auth-context";
 import { Mode } from "@/config/auth";
+import { Github } from "lucide-react";
 
 export function SignUp() {
   const { setMode, setEmail: setContextEmail } = useAuthNavigation();
@@ -72,10 +71,7 @@ export function SignUp() {
         return;
       }
 
-      if (
-        signInResult.data &&
-        "twoFactorRedirect" in signInResult.data
-      ) {
+      if (signInResult.data && "twoFactorRedirect" in signInResult.data) {
         await authClient.twoFactor.sendOtp();
         toast.success(
           "Account created! Check your email for a verification code.",
@@ -104,23 +100,21 @@ export function SignUp() {
   };
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader className="text-center">
-        <CardTitle className={cn("text-3xl italic", dmSans.className)}>
-          Create an account
+    <Card className="w-full max-w-md px-0">
+      <CardHeader className="text-left px-0">
+        <CardTitle className="font-serif px-6 text-3xl font-normal tracking-tight text-white">
+          Create account
         </CardTitle>
-        <CardDescription className="text-base">
-          Join{" "}
-          <span className={cn("font-semibold", dmSans.className)}>
-            re:Automate
-          </span>{" "}
-          today
+        <CardDescription className="border-b pb-4 px-6 text-sm">
+          Join StudyRot and rot your way to 4.0 GPA
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div className="space-y-2">
-            <Label htmlFor="name">Full Name</Label>
+            <Label htmlFor="name" className="text-sm font-normal">
+              Full Name
+            </Label>
             <Input
               id="name"
               type="text"
@@ -129,22 +123,28 @@ export function SignUp() {
               onChange={(e) => setName(e.target.value)}
               required
               disabled={isLoading}
+              className="h-11 rounded-sm"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email" className="text-sm font-normal">
+              Email
+            </Label>
             <Input
               id="email"
               type="email"
-              placeholder="you@example.com"
+              placeholder="user@nextmail.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
               disabled={isLoading}
+              className="h-11 rounded-sm"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password" className="text-sm font-normal">
+              Password
+            </Label>
             <Input
               id="password"
               type="password"
@@ -153,10 +153,13 @@ export function SignUp() {
               onChange={(e) => setPassword(e.target.value)}
               required
               disabled={isLoading}
+              className="h-11 rounded-sm"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirm Password</Label>
+            <Label htmlFor="confirmPassword" className="text-sm font-normal">
+              Confirm Password
+            </Label>
             <Input
               id="confirmPassword"
               type="password"
@@ -165,30 +168,27 @@ export function SignUp() {
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
               disabled={isLoading}
+              className="h-11 rounded-sm"
             />
           </div>
           <Button
             type="submit"
-            className="w-full"
-            size="lg"
+            className="h-11 w-full rounded-sm border font-medium text-white transition-colors"
             disabled={isLoading}
           >
             {isLoading ? "Creating account..." : "Sign Up"}
           </Button>
         </form>
       </CardContent>
-      <CardFooter className="flex flex-col space-y-2 pt-1">
-        <span className="px-2 text-sm text-muted-foreground">
-          Or continue with
-        </span>
-
+      <CardFooter className="flex flex-col gap-4 border-t border-zinc-700/80 pt-6">
         <Button
           variant="outline"
           type="button"
-          className="w-full"
+          className="flex h-11 w-full items-center justify-center gap-2 rounded-sm border-zinc-600 bg-zinc-900 text-white transition-colors hover:border-zinc-500 hover:bg-zinc-800"
           onClick={handleGitHubSignIn}
         >
-          GitHub
+          <Github className="size-5" />
+          Sign up with GitHub
         </Button>
       </CardFooter>
     </Card>

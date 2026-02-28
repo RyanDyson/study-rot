@@ -67,7 +67,7 @@ export const mockThreads: Record<string, Thread> = {
         handle: "@ConceptBot",
         avatarColor: "bg-primary",
         content:
-          "Hot take: \"Overfitting is just your model trying really hard.\" 🔥",
+          'Hot take: "Overfitting is just your model trying really hard." 🔥',
         order: 1,
         type: "misconception",
         timestamp: "49m",
@@ -90,12 +90,13 @@ export const mockThreads: Record<string, Thread> = {
                 author: "MLExpert",
                 handle: "@MLExpert",
                 avatarColor: "bg-chart-5",
-                content: "Exactly! Understanding the difference is crucial for model evaluation.",
+                content:
+                  "Exactly! Understanding the difference is crucial for model evaluation.",
                 order: 1,
                 timestamp: "42m",
                 likes: 3,
-              }
-            ]
+              },
+            ],
           },
           {
             id: "t1-r2",
@@ -107,7 +108,7 @@ export const mockThreads: Record<string, Thread> = {
             timestamp: "40m",
             likes: 8,
           },
-        ]
+        ],
       },
       {
         id: "t2",
@@ -142,7 +143,7 @@ export const mockThreads: Record<string, Thread> = {
             timestamp: "38m",
             likes: 15,
           },
-        ]
+        ],
       },
       {
         id: "t3",
@@ -167,7 +168,7 @@ export const mockThreads: Record<string, Thread> = {
             timestamp: "33m",
             likes: 4,
           },
-        ]
+        ],
       },
       {
         id: "t4",
@@ -175,7 +176,7 @@ export const mockThreads: Record<string, Thread> = {
         handle: "@MythBuster",
         avatarColor: "bg-destructive",
         content:
-          "Misconception: \"More parameters always = better model.\" Nope. More params = more capacity to overfit. This is where regularization and validation sets come in…",
+          'Misconception: "More parameters always = better model." Nope. More params = more capacity to overfit. This is where regularization and validation sets come in…',
         order: 4,
         type: "misconception",
         timestamp: "30m",
@@ -209,12 +210,13 @@ export const mockThreads: Record<string, Thread> = {
             author: "AIEnthusiast",
             handle: "@AIEnthusiast",
             avatarColor: "bg-chart-2",
-            content: "Yes! Dropout was mentioned earlier. It's definitely a regularization technique.",
+            content:
+              "Yes! Dropout was mentioned earlier. It's definitely a regularization technique.",
             order: 2,
             timestamp: "20m",
             likes: 6,
           },
-        ]
+        ],
       },
       {
         id: "t6",
@@ -239,7 +241,7 @@ export const mockThreads: Record<string, Thread> = {
             timestamp: "15m",
             likes: 9,
           },
-        ]
+        ],
       },
     ],
   },
@@ -283,7 +285,7 @@ export const mockThreads: Record<string, Thread> = {
             timestamp: "4m",
             likes: 12,
           },
-        ]
+        ],
       },
       {
         id: "r2",
@@ -291,7 +293,7 @@ export const mockThreads: Record<string, Thread> = {
         handle: "@CodeSkeptic",
         avatarColor: "bg-chart-2",
         content:
-          "Ragebait: \"You should put everything in one big useState object.\" Please don't. Split state by what changes together. One object = unnecessary re-renders and confusing updates.",
+          'Ragebait: "You should put everything in one big useState object." Please don\'t. Split state by what changes together. One object = unnecessary re-renders and confusing updates.',
         order: 2,
         type: "misconception",
         timestamp: "50m",
@@ -320,7 +322,7 @@ export const mockThreads: Record<string, Thread> = {
             timestamp: "48m",
             likes: 15,
           },
-        ]
+        ],
       },
       {
         id: "r4",

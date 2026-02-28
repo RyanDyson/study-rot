@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
-import { auth } from "./server/better-auth";
+import { auth } from "@/server/better-auth";
 
 export async function middleware(request: NextRequest) {
   const session = await auth.api.getSession({
@@ -18,6 +18,6 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  runtime: "nodejs", // Required for auth.api calls
-  matcher: ["/dashboard"], // Specify the routes the middleware applies to
+  runtime: "nodejs",
+  matcher: ["/dashboard", "/dashboard/:path*"],
 };
