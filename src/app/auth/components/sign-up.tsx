@@ -16,15 +16,16 @@ import { dmSans } from "@/lib/fonts";
 import { cn } from "@/lib/utils";
 import { authClient } from "@/server/better-auth/client";
 import { toast } from "sonner";
-// import { useAuthNavigation } from "../auth-context";
-// import { Mode } from "../config";
+import { useAuthNavigation } from "./auth-context";
+import { Mode } from "@/config/auth";
 
 export function SignUp() {
-  // const { setMode } = useAuthNavigation();
+  const { setMode, setEmail: setContextEmail } = useAuthNavigation();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,23 +40,66 @@ export function SignUp() {
       return;
     }
 
+    setIsLoading(true);
+
     try {
-      const data = await authClient.signUp.email({
+      const signUpResult = await authClient.signUp.email({
         email,
         password,
         name,
       });
 
-      if (data.error) {
-        toast.error(data.error.message || "Failed to create account");
-      } else {
-        toast.success("Account created! Please verify your email.");
-        // Navigate to OTP verification if email verification is required
-        // setMode(Mode.OTP);
+      if (signUpResult.error) {
+        toast.error(signUpResult.error.message || "Failed to create account");
+        return;
+      }
+
+      const enableResult = await authClient.twoFactor.enable({ password });
+
+      if (enableResult.error) {
+        toast.error(
+          enableResult.error.message || "Failed to enable two-factor auth",
+        );
+        return;
+      }
+
+      await authClient.signOut();
+
+      const signInResult = await authClient.signIn.email({ email, password });
+
+      if (signInResult.error) {
+        toast.error(signInResult.error.message || "Failed to sign in");
+        return;
+      }
+
+      if (
+        signInResult.data &&
+        "twoFactorRedirect" in signInResult.data
+      ) {
+        await authClient.twoFactor.sendOtp();
+        toast.success(
+          "Account created! Check your email for a verification code.",
+        );
+        setContextEmail(email);
+        setMode(Mode.OTP);
       }
     } catch (error) {
       toast.error("An error occurred. Please try again.");
       console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGitHubSignIn = async () => {
+    const data = await authClient.signIn.social({
+      provider: "github",
+      callbackURL: "/dashboard",
+    });
+
+    if (data.error) {
+      console.error(data.error);
+      toast.error(data.error.message);
     }
   };
 
@@ -84,6 +128,7 @@ export function SignUp() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
+              disabled={isLoading}
             />
           </div>
           <div className="space-y-2">
@@ -95,6 +140,7 @@ export function SignUp() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              disabled={isLoading}
             />
           </div>
           <div className="space-y-2">
@@ -106,6 +152,7 @@ export function SignUp() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              disabled={isLoading}
             />
           </div>
           <div className="space-y-2">
@@ -117,10 +164,16 @@ export function SignUp() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
+              disabled={isLoading}
             />
           </div>
-          <Button type="submit" className="w-full" size="lg">
-            Sign Up
+          <Button
+            type="submit"
+            className="w-full"
+            size="lg"
+            disabled={isLoading}
+          >
+            {isLoading ? "Creating account..." : "Sign Up"}
           </Button>
         </form>
       </CardContent>
@@ -129,8 +182,13 @@ export function SignUp() {
           Or continue with
         </span>
 
-        <Button variant="outline" type="button" className="w-full">
-          Google
+        <Button
+          variant="outline"
+          type="button"
+          className="w-full"
+          onClick={handleGitHubSignIn}
+        >
+          GitHub
         </Button>
       </CardFooter>
     </Card>
