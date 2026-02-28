@@ -1,4 +1,5 @@
 import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc";
+import { langchainRouter } from "./route/langchain";
 
 /**
  * This is the primary router for your server.
@@ -8,6 +9,7 @@ import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc";
 export const appRouter = createTRPCRouter({
   //import routes here
   //.e.g user: userRouter
+  langchain: langchainRouter,
 });
 
 // export type definition of API
