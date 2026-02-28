@@ -1,25 +1,22 @@
-import dotenv from "dotenv";
+import { env } from "@/env";
 import {
   PGVectorStore,
   DistanceStrategy,
 } from "@langchain/community/vectorstores/pgvector";
-import { BedrockEmbeddings, ChatBedrockConverse } from "@langchain/aws";
+import { BedrockEmbeddings } from "@langchain/aws";
 // import { BedrockChat } from "@langchain/community";
 // import { OpenAIEmbeddings } from "@langchain/openai";
 import { Document } from "@langchain/core/documents";
 import { PoolConfig } from "pg";
 import { v4 as uuidv4 } from "uuid";
-import postgres from "postgres";
 
-dotenv.config();
-
-const DATABASE_URL = process.env.DATABASE_URL;
+const DATABASE_URL = env.DATABASE_URL;
 
 const embeddings = new BedrockEmbeddings({
   region: "us-east-1",
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.SECRET_ACCESS_KEY!,
+    accessKeyId: env.AWS_ACCESS_KEY_ID!,
+    secretAccessKey: env.SECRET_ACCESS_KEY!,
   },
   model: "amazon.titan-embed-text-v2:0",
 });
