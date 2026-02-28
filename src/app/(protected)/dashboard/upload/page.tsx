@@ -36,7 +36,7 @@ export default function DashboardUploadPage() {
 
   const [courseName, setCourseName] = useState("");
   const [courseDescription, setCourseDescription] = useState("");
-  const [knowledgeBaseId, setKnowledgeBaseId] = useState<string | null>(null)
+  const [knowledgeBaseId, setKnowledgeBaseId] = useState<string | null>(null);
   const { mutateAsync } = api.knowledgeBase.create.useMutation();
 
   const handleFilesChange = (files: FileWithPreview[]) => {
@@ -56,20 +56,6 @@ export default function DashboardUploadPage() {
         await uploadFile(fileWithPreview, result.id);
       }
     }
-  };
-
-  const handleGenerate = () => {
-    if (!knowledgeBaseId) return;
-    void getExtractedTexts.refetch().then((result) => {
-      console.log("Extracted texts:", result.data);
-    });
-  };
-
-  const statusLabel: Record<OcrStatus, string> = {
-    pending: "Queued",
-    processing: "Extracting...",
-    completed: "Ready",
-    failed: "Failed",
   };
 
   return (
@@ -128,7 +114,6 @@ export default function DashboardUploadPage() {
             </form>
           </CardContent>
         </Card>
-        
       </section>
     </div>
   );
