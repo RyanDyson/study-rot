@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -20,13 +21,16 @@ import { useAuthNavigation } from "./auth-context";
 import { Mode } from "@/config/auth";
 
 export function SignIn() {
-  const { setMode } = useAuthNavigation();
+  const { setMode, setEmail: setContextEmail } = useAuthNavigation();
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const googleSignIn = async () => {
+  const handleGitHubSignIn = async () => {
     const data = await authClient.signIn.social({
-      provider: "google",
+      provider: "github",
+      callbackURL: "/dashboard",
     });
 
     if (data.error) {
@@ -35,21 +39,33 @@ export function SignIn() {
     }
   };
 
-  const emailSignIn = async () => {
-    const data = await authClient.signIn.email({
-      email,
-      password,
-    });
-
-    if (data.error) {
-      console.error(data.error);
-      toast.error(data.error.message);
-    }
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    emailSignIn();
+    setIsLoading(true);
+
+    try {
+      const data = await authClient.signIn.email({ email, password });
+
+      if (data.error) {
+        console.error(data.error);
+        toast.error(data.error.message);
+        return;
+      }
+
+      if (data.data && "twoFactorRedirect" in data.data) {
+        await authClient.twoFactor.sendOtp();
+        toast.success("Check your email for a verification code.");
+        setContextEmail(email);
+        setMode(Mode.OTP);
+      } else {
+        router.push("/dashboard");
+      }
+    } catch (error) {
+      toast.error("An error occurred. Please try again.");
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -59,10 +75,7 @@ export function SignIn() {
           Welcome Back
         </CardTitle>
         <CardDescription className="text-base">
-          Sign in to
-          {/* <span className={cn("font-semibold", dmSans.className)}>
-            put app name
-          </span> */}
+          Sign in to continue
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -76,6 +89,7 @@ export function SignIn() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              disabled={isLoading}
             />
           </div>
           <div className="space-y-2">
@@ -96,10 +110,16 @@ export function SignIn() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              disabled={isLoading}
             />
           </div>
-          <Button type="submit" className="w-full" size="lg">
-            Sign In
+          <Button
+            type="submit"
+            className="w-full"
+            size="lg"
+            disabled={isLoading}
+          >
+            {isLoading ? "Signing in..." : "Sign In"}
           </Button>
         </form>
       </CardContent>
@@ -112,9 +132,9 @@ export function SignIn() {
           variant="outline"
           type="button"
           className="w-full"
-          onClick={googleSignIn}
+          onClick={handleGitHubSignIn}
         >
-          Google
+          GitHub
         </Button>
       </CardFooter>
     </Card>

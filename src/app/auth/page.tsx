@@ -1,14 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Mode, ModeConfig } from "@/config/auth";
 import { AuthContext } from "./components/auth-context";
 
 export default function AuthPage() {
   const [mode, setMode] = useState<Mode>(Mode.LOGIN);
+  const [email, setEmail] = useState("");
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("token")) {
+      setMode(Mode.RESET_PASSWORD);
+    }
+  }, []);
 
   return (
-    <AuthContext.Provider value={{ mode, setMode }}>
+    <AuthContext.Provider value={{ mode, setMode, email, setEmail }}>
       <div className="min-w-screen h-screen flex items-center justify-center">
         <div className="hidden lg:flex items-center w-1/2 h-full  bg-linear-to-br from-primary to-secondary">
           <div className="-translate-x-32 p-1 bg-neutral-300/90 border-2 backdrop-blur-xl rounded-xl border-neutral-400 flex flex-col items-center justify-center">

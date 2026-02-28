@@ -6,6 +6,8 @@ import type { Mode } from "@/config/auth";
 interface AuthContextType {
   setMode: (mode: Mode) => void;
   mode: Mode;
+  email: string;
+  setEmail: (email: string) => void;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(

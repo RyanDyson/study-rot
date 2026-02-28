@@ -5,7 +5,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -19,35 +18,25 @@ import { toast } from "sonner";
 import { useAuthNavigation } from "./auth-context";
 import { Mode } from "@/config/auth";
 
-interface ResetPasswordProps {
-  token?: string;
-  email?: string;
-}
-
-export function ResetPassword({ token, email }: ResetPasswordProps) {
+export function ResetPassword() {
   const { setMode } = useAuthNavigation();
-  const [step, setStep] = useState<"request" | "reset">(
-    token ? "reset" : "request",
-  );
-  const [requestEmail, setRequestEmail] = useState(email || "");
-  const [resetToken, setResetToken] = useState(token || "");
+  const [step, setStep] = useState<"request" | "reset">("request");
+  const [requestEmail, setRequestEmail] = useState("");
+  const [resetToken, setResetToken] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Check URL for token parameter
   useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       const urlToken = params.get("token");
-      const urlEmail = params.get("email");
       if (urlToken) {
         setStep("reset");
         setResetToken(urlToken);
-        setRequestEmail(urlEmail || "");
       }
     }
   }, []);
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
 
   const handleRequestReset = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,32 +49,20 @@ export function ResetPassword({ token, email }: ResetPasswordProps) {
     setIsLoading(true);
 
     try {
-      // Better Auth password reset request
-      // Note: Better Auth may use a different method name or structure
-      // You may need to use: authClient.forgetPassword() or authClient.sendPasswordResetEmail()
-      // or implement a custom API route for password reset requests
-      // This is a placeholder - adjust based on your Better Auth configuration
-
-      // Option 1: If Better Auth has forgetPassword method (uncomment if available)
-      // const data = await authClient.forgetPassword({
-      //   email: requestEmail,
-      //   redirectTo: `${window.location.origin}/auth/reset-password`,
-      // });
-
-      // Option 2: Use a custom API route
       const response = await fetch("/api/auth/forget-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: requestEmail }),
+        body: JSON.stringify({
+          email: requestEmail,
+          redirectTo: "/auth",
+        }),
       });
 
-      const data = await response.json();
-
-      if (data.error || !response.ok) {
-        toast.error(data.error?.message || "Failed to send reset email");
+      if (!response.ok) {
+        const errorData = await response.json();
+        toast.error(errorData?.message || "Failed to send reset email");
       } else {
-        toast.success("Password reset email sent! Check your inbox.");
-        setStep("reset");
+        toast.success("Password reset link sent! Check your email.");
       }
     } catch (error) {
       toast.error("An error occurred. Please try again.");
@@ -116,17 +93,15 @@ export function ResetPassword({ token, email }: ResetPasswordProps) {
     setIsLoading(true);
 
     try {
-      // Better Auth password reset - uses newPassword instead of password
       const data = await authClient.resetPassword({
         newPassword: password,
-        token: resetToken || token || "",
+        token: resetToken,
       });
 
       if (data.error) {
         toast.error(data.error.message || "Failed to reset password");
       } else {
         toast.success("Password reset successfully!");
-        // Navigate to sign in
         setTimeout(() => {
           setMode(Mode.LOGIN);
         }, 1500);
