@@ -10,10 +10,10 @@ export const user = pgTable("user", {
     .notNull(),
   image: text("image"),
   createdAt: timestamp("created_at")
-    .$defaultFn(() => /* @__PURE__ */ new Date())
+    .$defaultFn(() => /* @_PURE_ */ new Date())
     .notNull(),
   updatedAt: timestamp("updated_at")
-    .$defaultFn(() => /* @__PURE__ */ new Date())
+    .$defaultFn(() => /* @_PURE_ */ new Date())
     .notNull(),
   twoFactorEnabled: boolean("two_factor_enabled")
     .$defaultFn(() => false)
@@ -57,10 +57,10 @@ export const verification = pgTable("verification", {
   value: text("value").notNull(),
   expiresAt: timestamp("expires_at").notNull(),
   createdAt: timestamp("created_at").$defaultFn(
-    () => /* @__PURE__ */ new Date(),
+    () => /* @_PURE_ */ new Date(),
   ),
   updatedAt: timestamp("updated_at").$defaultFn(
-    () => /* @__PURE__ */ new Date(),
+    () => /* @_PURE_ */ new Date(),
   ),
 });
 
@@ -75,9 +75,10 @@ export const twoFactor = pgTable("two_factor", {
 
 export const knowledgeBase = pgTable("knowledge_base", {
   id: uuid("id").primaryKey().defaultRandom(),
-  name: text("name").notNull(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
   createdAt: timestamp("created_at").$defaultFn(
-    () => /* @__PURE__ */ new Date(),
+    () => /* @_PURE_ */ new Date(),
   ),
   userId: text("user_id").notNull().references(() => user.id, {onDelete: "cascade"})
 });
@@ -86,9 +87,11 @@ export const knowledgeFiles = pgTable("knowledgeFiles", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
   createdAt: timestamp("created_at").$defaultFn(
-    () => /* @__PURE__ */ new Date(),
+    () => /* @_PURE_ */ new Date(),
   ),
-  knowledgeBaseId: uuid("knowledge_base_id").notNull().references(() => knowledgeBase.id, {onDelete: 'cascade'})
+  knowledgeBaseId: uuid("knowledge_base_id").notNull().references(() => knowledgeBase.id, {onDelete: 'cascade'}),
+  ocrStatus: text("ocr_status").$defaultFn(() => "pending").notNull(),
+  extractedText: text("extracted_text"),
 });
 
 export const userRelations = relations(user, ({ many }) => ({
@@ -111,5 +114,5 @@ export const knowledgeBaseRelations = relations(knowledgeBase, ({one, many}) => 
 }))
 
 export const knowledgeFilesRelations = relations(knowledgeFiles, ({one}) => ({
-  knowledgeBase: one(knowledgeBase, {fields: [knowledgeFiles.id], references: [knowledgeBase.id]})
+  knowledgeBase: one(knowledgeBase, {fields: [knowledgeFiles.knowledgeBaseId], references: [knowledgeBase.id]})
 }))

@@ -1,15 +1,18 @@
-import { writeFile, mkdir, readdir, stat } from "fs/promises"
-import path from "path"
+import { writeFile, mkdir } from "fs/promises";
+import path from "path";
+import { db } from "@/server/db";
+import { knowledgeFiles } from "@/server/db/schema";
+import { runOcrForFile } from "@/server/ocr/ocr-service";
 
-const TMP_UPLOAD_DIR = path.join(process.cwd(), "tmp", "uploads")
-const MAX_SIZE_BYTES = 50 * 1024 * 1024 // 50MB
+const TMP_UPLOAD_DIR = path.join(process.cwd(), "tmp", "uploads");
+const MAX_SIZE_BYTES = 50 * 1024 * 1024; // 50MB
 
 function sanitizeFilename(name: string): string {
-  return name.replace(/[^a-zA-Z0-9._-]/g, "_")
+  return name.replace(/[^a-zA-Z0-9._-]/g, "_");
 }
 
 function getMimeType(filename: string): string {
-  const ext = path.extname(filename).toLowerCase()
+  const ext = path.extname(filename).toLowerCase();
   const map: Record<string, string> = {
     ".pdf": "application/pdf",
     ".zip": "application/zip",
@@ -21,44 +24,26 @@ function getMimeType(filename: string): string {
     ".png": "image/png",
     ".jpg": "image/jpeg",
     ".jpeg": "image/jpeg",
-  }
-  return map[ext] ?? "application/octet-stream"
-}
-
-export async function GET() {
-  try {
-    await mkdir(TMP_UPLOAD_DIR, { recursive: true })
-    const entries = await readdir(TMP_UPLOAD_DIR, { withFileTypes: true })
-    const files = await Promise.all(
-      entries
-        .filter((e) => e.isFile())
-        .map(async (e) => {
-          const filepath = path.join(TMP_UPLOAD_DIR, e.name)
-          const st = await stat(filepath)
-          return {
-            id: e.name,
-            name: e.name,
-            size: st.size,
-            type: getMimeType(e.name),
-            url: "",
-          }
-        })
-    )
-    return Response.json({ files })
-  } catch (err) {
-    console.error("List uploads error:", err)
-    return Response.json({ error: "Failed to list uploads" }, { status: 500 })
-  }
+  };
+  return map[ext] ?? "application/octet-stream";
 }
 
 export async function POST(request: Request) {
   try {
     const formData = await request.formData()
     const file = formData.get("file")
+    const knowledgeBaseId = formData.get("id")
 
-    if (!file || !(file instanceof File)) {
+    if (!(file instanceof File)) {
       return Response.json(
         { error: "No file provided" },
+        { status: 400 }
+      )
+    }
+
+    if (!knowledgeBaseId || typeof knowledgeBaseId !== "string") {
+      return Response.json(
+        { error: "No knowledge base ID provided" },
         { status: 400 }
       )
     }
@@ -66,31 +51,39 @@ export async function POST(request: Request) {
     if (file.size > MAX_SIZE_BYTES) {
       return Response.json(
         { error: `File exceeds maximum size of ${MAX_SIZE_BYTES / 1024 / 1024}MB` },
-        { status: 413 }
-      )
+        { status: 413 },
+      );
     }
 
-    await mkdir(TMP_UPLOAD_DIR, { recursive: true })
+    await mkdir(TMP_UPLOAD_DIR, { recursive: true });
 
-    const timestamp = Date.now()
-    const safeName = sanitizeFilename(file.name)
-    const filename = `${timestamp}-${safeName}`
-    const filepath = path.join(TMP_UPLOAD_DIR, filename)
+    const timestamp = Date.now();
+    const safeName = sanitizeFilename(file.name);
+    const filename = `${timestamp}-${safeName}`;
+    const filepath = path.join(TMP_UPLOAD_DIR, filename);
 
-    const bytes = await file.arrayBuffer()
-    const buffer = Buffer.from(bytes)
-    await writeFile(filepath, buffer)
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+    await writeFile(filepath, buffer);
 
-    return Response.json({
-      ok: true,
-      filename,
-      path: filepath,
-    })
+    const [inserted] = await db
+      .insert(knowledgeFiles)
+      .values({
+        name: file.name,
+        knowledgeBaseId,
+        ocrStatus: "pending",
+      })
+      .returning({ id: knowledgeFiles.id });
+
+    if (!inserted) {
+      return Response.json({ error: "Failed to insert file record" }, { status: 500 });
+    }
+
+    void runOcrForFile(inserted.id, filepath, file.name);
+
+    return Response.json({ ok: true, filename })
   } catch (err) {
-    console.error("Upload error:", err)
-    return Response.json(
-      { error: "Upload failed" },
-      { status: 500 }
-    )
+    console.error("Upload error:", err);
+    return Response.json({ error: "Upload failed" }, { status: 500 });
   }
 }

@@ -5,6 +5,8 @@
 import "./src/env.js";
 
 /** @type {import("next").NextConfig} */
-const config = {};
+const config = {
+  serverExternalPackages: ["pdfjs-dist", "canvas", "tesseract.js"],
+};
 
 export default config;
