@@ -55,27 +55,51 @@ export const knowledgeBaseRouter = createTRPCRouter({
             if (!knowledge) throw "Knowledge Base not found";
 
             // Insert files into DB
-            await db.insert(knowledgeFiles)
-                .values(
-                    input.files.map(file => ({
-                        name: file.name,
-                        knowledgeBaseId: knowledge.id
-                    }))
-                )
+            const [created] = await db
+        .insert(knowledgeBase)
+        .values({ name: input.name, userId: ctx.session.user.id })
+        .returning({ id: knowledgeBase.id });
+      return { id: created!.id };
+    }),
+  getFileStatus: protectedProcedure
+    .input(z.string())
+    .query(async ({ input }) => {
+      const file = await db.query.knowledgeFiles.findFirst({
+        where: eq(knowledgeFiles.id, input),
+        columns: { id: true, name: true, ocrStatus: true },
+      });
+      return file ?? null;
+    }),
+  getExtractedTexts: protectedProcedure
+    .input(z.string())
+    .query(async ({ ctx, input }) => {
+      const kb = await db.query.knowledgeBase.findFirst({
+        where: and(
+          eq(knowledgeBase.id, input),
+          eq(knowledgeBase.userId, ctx.session.user.id),
+        ),
+      });
+      if (!kb) return [];
 
-            // TODO: insert to knowledge base ID
-        }),
-    delete: protectedProcedure
-        .input(z.string())
-        .mutation(async ({ctx, input}) => {
-            // verify knowledge base exist
-            const knowledge = await db.query.knowledgeBase.findFirst({
-                where: and(
-                        eq(knowledgeBase.userId, ctx.session.user.id),
-                        eq(knowledgeBase.id, input)
-                    )
-            })
-            if (!knowledge) throw "Knowledge Base not found";
+      const files = await db.query.knowledgeFiles.findMany({
+        where: and(
+          eq(knowledgeFiles.knowledgeBaseId, input),
+          eq(knowledgeFiles.ocrStatus, "completed"),
+        ),
+        columns: { id: true, name: true, extractedText: true },
+      });
+      return files.map((f) => ({ id: f.id, name: f.name, text: f.extractedText ?? "" }));
+    }),
+  delete: protectedProcedure
+    .input(z.string())
+    .mutation(async ({ ctx, input }) => {
+      const knowledge = await db.query.knowledgeBase.findFirst({
+        where: and(
+          eq(knowledgeBase.userId, ctx.session.user.id),
+          eq(knowledgeBase.id, input),
+        ),
+      });
+      if (!knowledge) throw "Knowledge Base not found";
 
       await db.delete(knowledgeBase).where(
         and(

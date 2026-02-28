@@ -32,11 +32,18 @@ export async function POST(request: Request) {
   try {
     const formData = await request.formData()
     const file = formData.get("file")
-    const id = formData.get("id")
+    const knowledgeBaseId = formData.get("id")
 
     if (!(file instanceof File)) {
       return Response.json(
         { error: "No file provided" },
+        { status: 400 }
+      )
+    }
+
+    if (!knowledgeBaseId || typeof knowledgeBaseId !== "string") {
+      return Response.json(
+        { error: "No knowledge base ID provided" },
         { status: 400 }
       )
     }

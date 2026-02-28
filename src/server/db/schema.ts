@@ -10,10 +10,10 @@ export const user = pgTable("user", {
     .notNull(),
   image: text("image"),
   createdAt: timestamp("created_at")
-    .$defaultFn(() => /* @__PURE__ */ new Date())
+    .$defaultFn(() => /* @_PURE_ */ new Date())
     .notNull(),
   updatedAt: timestamp("updated_at")
-    .$defaultFn(() => /* @__PURE__ */ new Date())
+    .$defaultFn(() => /* @_PURE_ */ new Date())
     .notNull(),
   twoFactorEnabled: boolean("two_factor_enabled")
     .$defaultFn(() => false)
@@ -57,10 +57,10 @@ export const verification = pgTable("verification", {
   value: text("value").notNull(),
   expiresAt: timestamp("expires_at").notNull(),
   createdAt: timestamp("created_at").$defaultFn(
-    () => /* @__PURE__ */ new Date(),
+    () => /* @_PURE_ */ new Date(),
   ),
   updatedAt: timestamp("updated_at").$defaultFn(
-    () => /* @__PURE__ */ new Date(),
+    () => /* @_PURE_ */ new Date(),
   ),
 });
 
@@ -78,16 +78,16 @@ export const knowledgeBase = pgTable("knowledge_base", {
   title: text("title").notNull(),
   description: text("description").notNull(),
   createdAt: timestamp("created_at").$defaultFn(
-    () => /* @__PURE__ */ new Date(),
+    () => /* @_PURE_ */ new Date(),
   ),
   userId: text("user_id").notNull().references(() => user.id, {onDelete: "cascade"})
 });
 
-export const knowledgeFiles = pgTable("knowledge_files", {
+export const knowledgeFiles = pgTable("knowledgeFiles", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
   createdAt: timestamp("created_at").$defaultFn(
-    () => /* @__PURE__ */ new Date(),
+    () => /* @_PURE_ */ new Date(),
   ),
   knowledgeBaseId: uuid("knowledge_base_id").notNull().references(() => knowledgeBase.id, {onDelete: 'cascade'}),
   ocrStatus: text("ocr_status").$defaultFn(() => "pending").notNull(),
