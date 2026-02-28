@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER} # Custom user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD} # Password for the user
+      POSTGRES_DB: ${POSTGRES_DB} # Name of the default database
+    ports:
+      - '5432:5432' # Expose port 5432
+    volumes:
+      - pgdata:/var/lib/postgresql # Persist data
+
+volumes:
+  pgdata: # Named volume for data persistence
