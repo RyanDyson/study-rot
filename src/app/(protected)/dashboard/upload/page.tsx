@@ -31,33 +31,15 @@ async function uploadFile(fileWithPreview: FileWithPreview, id: string) {
 }
 
 export default function DashboardUploadPage() {
-  const [initialFiles, setInitialFiles] = useState<FileMetadata[]>([]);
-  const [hasFetched, setHasFetched] = useState(false);
-  const prevFilesRef = useRef<FileWithPreview[]>([]);
+  const filesRef = useRef<FileWithPreview[]>([]);
 
   const [courseName, setCourseName] = useState("");
   const [courseDescription, setCourseDescription] = useState("");
 
   const { mutateAsync } = api.knowledgeBase.create.useMutation();
 
-  useEffect(() => {
-    fetch("/api/upload")
-      .then((res) => (res.ok ? res.json() : { files: [] }))
-      .then((data) => {
-        const files = data.files ?? [];
-        setInitialFiles(files);
-        prevFilesRef.current = files.map((f: FileMetadata) => ({
-          file: f,
-          id: f.id,
-          preview: f.url,
-        }));
-        setHasFetched(true);
-      })
-      .catch(() => setHasFetched(true));
-  }, []);
-
   const handleFilesChange = (files: FileWithPreview[]) => {
-    prevFilesRef.current = files;
+    filesRef.current = files;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -68,7 +50,7 @@ export default function DashboardUploadPage() {
       description: courseDescription,
     });
 
-    for (const fileWithPreview of prevFilesRef.current) {
+    for (const fileWithPreview of filesRef.current) {
       if (fileWithPreview.file instanceof File) {
         await uploadFile(fileWithPreview, result.id);
       }
@@ -114,13 +96,10 @@ export default function DashboardUploadPage() {
                 <Label>Files</Label>
                 <div className="rounded-lg border bg-card p-6">
                   <TableUpload
-                    key={hasFetched ? "ready" : "loading"}
                     maxFiles={10}
                     maxSize={50 * 1024 * 1024}
                     accept="*"
                     multiple
-                    initialFiles={initialFiles}
-                    simulateUpload
                     onFilesChange={handleFilesChange}
                   />
                 </div>

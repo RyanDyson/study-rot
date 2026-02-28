@@ -1,4 +1,4 @@
-import { writeFile, mkdir, readdir, stat } from "fs/promises"
+import { writeFile, mkdir } from "fs/promises"
 import path from "path"
 
 const TMP_UPLOAD_DIR = path.join(process.cwd(), "tmp", "uploads")
@@ -23,32 +23,6 @@ function getMimeType(filename: string): string {
     ".jpeg": "image/jpeg",
   }
   return map[ext] ?? "application/octet-stream"
-}
-
-export async function GET() {
-  try {
-    await mkdir(TMP_UPLOAD_DIR, { recursive: true })
-    const entries = await readdir(TMP_UPLOAD_DIR, { withFileTypes: true })
-    const files = await Promise.all(
-      entries
-        .filter((e) => e.isFile())
-        .map(async (e) => {
-          const filepath = path.join(TMP_UPLOAD_DIR, e.name)
-          const st = await stat(filepath)
-          return {
-            id: e.name,
-            name: e.name,
-            size: st.size,
-            type: getMimeType(e.name),
-            url: "",
-          }
-        })
-    )
-    return Response.json({ files })
-  } catch (err) {
-    console.error("List uploads error:", err)
-    return Response.json({ error: "Failed to list uploads" }, { status: 500 })
-  }
 }
 
 export async function POST(request: Request) {
