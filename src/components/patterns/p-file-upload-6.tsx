@@ -39,7 +39,9 @@ interface TableUploadProps {
   accept?: string
   multiple?: boolean
   className?: string
+  initialFiles?: FileMetadata[]
   onFilesChange?: (files: FileWithPreview[]) => void
+  onFilesAdded?: (files: FileWithPreview[]) => void
   simulateUpload?: boolean
 }
 
@@ -49,10 +51,19 @@ export function Pattern({
   accept = "*",
   multiple = true,
   className,
+  initialFiles = [],
   onFilesChange,
+  onFilesAdded,
   simulateUpload = true,
 }: TableUploadProps) {
-  const [uploadFiles, setUploadFiles] = useState<FileUploadItem[]>([])
+  const defaultUploadItems: FileUploadItem[] = initialFiles.map((file) => ({
+    id: file.id,
+    file,
+    preview: file.url,
+    progress: 100,
+    status: "completed" as const,
+  }))
+  const [uploadFiles, setUploadFiles] = useState<FileUploadItem[]>(defaultUploadItems)
 
   const [
     { isDragging, errors },
@@ -71,6 +82,8 @@ export function Pattern({
     maxSize,
     accept,
     multiple,
+    initialFiles,
+    onFilesAdded,
     onFilesChange: (newFiles) => {
       // Convert to upload items when files change, preserving existing status
       const newUploadFiles = newFiles.map((file) => {
