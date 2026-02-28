@@ -1,13 +1,5 @@
 import { relations } from "drizzle-orm";
-import {
-  boolean,
-  index,
-  pgTable,
-  pgTableCreator,
-  text,
-  timestamp,
-  uuid
-} from "drizzle-orm/pg-core";
+import { boolean, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -22,6 +14,9 @@ export const user = pgTable("user", {
     .notNull(),
   updatedAt: timestamp("updated_at")
     .$defaultFn(() => /* @__PURE__ */ new Date())
+    .notNull(),
+  twoFactorEnabled: boolean("two_factor_enabled")
+    .$defaultFn(() => false)
     .notNull(),
 });
 
@@ -67,6 +62,15 @@ export const verification = pgTable("verification", {
   updatedAt: timestamp("updated_at").$defaultFn(
     () => /* @__PURE__ */ new Date(),
   ),
+});
+
+export const twoFactor = pgTable("two_factor", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  secret: text("secret").notNull(),
+  backupCodes: text("backup_codes").notNull(),
 });
 
 export const knowledgeBase = pgTable("knowledge_base", {
