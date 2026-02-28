@@ -1,6 +1,7 @@
-"use client"
+"use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Pattern as TableUpload } from "@/components/patterns/p-file-upload-6";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -55,6 +56,22 @@ export default function DashboardUploadPage() {
         await uploadFile(fileWithPreview, result.id);
       }
     }
+  };
+
+  const hasCompleted = trackedFiles.some((f) => f.ocrStatus === "completed");
+
+  const handleGenerate = () => {
+    if (!knowledgeBaseId) return;
+    void getExtractedTexts.refetch().then((result) => {
+      console.log("Extracted texts:", result.data);
+    });
+  };
+
+  const statusLabel: Record<OcrStatus, string> = {
+    pending: "Queued",
+    processing: "Extracting...",
+    completed: "Ready",
+    failed: "Failed",
   };
 
   return (

@@ -77,19 +77,13 @@ export const knowledgeBaseRouter = createTRPCRouter({
             })
             if (!knowledge) throw "Knowledge Base not found";
 
-            // Delete db cascade
-            await db.delete(knowledgeBase).where(
-                and(
-                    eq(knowledgeBase.userId, ctx.session.user.id),
-                    eq(knowledgeBase.id, input)
-                )
-            )
-
-            // TODO: delete from RAG knowledge base
-        })
-    
+      await db.delete(knowledgeBase).where(
+        and(
+          eq(knowledgeBase.userId, ctx.session.user.id),
+          eq(knowledgeBase.id, input),
+        ),
+      );
+    }),
 });
- 
-// Export only the type of a router!
-// This prevents us from importing server code on the client.
+
 export type KnowledgeBaseRouter = typeof knowledgeBaseRouter;

@@ -89,7 +89,9 @@ export const knowledgeFiles = pgTable("knowledge_files", {
   createdAt: timestamp("created_at").$defaultFn(
     () => /* @__PURE__ */ new Date(),
   ),
-  knowledgeBaseId: uuid("knowledge_base_id").notNull().references(() => knowledgeBase.id, {onDelete: 'cascade'})
+  knowledgeBaseId: uuid("knowledge_base_id").notNull().references(() => knowledgeBase.id, {onDelete: 'cascade'}),
+  ocrStatus: text("ocr_status").$defaultFn(() => "pending").notNull(),
+  extractedText: text("extracted_text"),
 });
 
 export const userRelations = relations(user, ({ many }) => ({
@@ -112,5 +114,5 @@ export const knowledgeBaseRelations = relations(knowledgeBase, ({one, many}) => 
 }))
 
 export const knowledgeFilesRelations = relations(knowledgeFiles, ({one}) => ({
-  knowledgeBase: one(knowledgeBase, {fields: [knowledgeFiles.id], references: [knowledgeBase.id]})
+  knowledgeBase: one(knowledgeBase, {fields: [knowledgeFiles.knowledgeBaseId], references: [knowledgeBase.id]})
 }))
