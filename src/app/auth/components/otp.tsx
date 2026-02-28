@@ -6,7 +6,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -17,8 +16,6 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { dmSans } from "@/lib/fonts";
-import { cn } from "@/lib/utils";
 import { authClient } from "@/server/better-auth/client";
 import { toast } from "sonner";
 import { useAuthNavigation } from "./auth-context";
@@ -81,20 +78,23 @@ export function OTP() {
   return (
     <Card className="w-full max-w-md">
       <CardHeader className="text-center">
-        <CardTitle className={cn("text-3xl", dmSans.className)}>
-          Verify Your Identity
+        <CardTitle className="font-serif text-3xl font-normal tracking-tight text-white">
+          Verify your identity
         </CardTitle>
-        <CardDescription className="text-base">
+        <CardDescription className="border-b pb-4 text-sm">
           Enter the 6-digit code sent to{" "}
           {email && (
-            <span className="font-semibold text-foreground">{email}</span>
+            <span className="font-semibold">{email}</span>
           )}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="otp" className="text-center w-full block">
+            <Label
+              htmlFor="otp"
+              className="block w-full text-center text-sm font-normal"
+            >
               Verification Code
             </Label>
             <div className="flex justify-center">
@@ -103,41 +103,57 @@ export function OTP() {
                 value={otp}
                 onChange={setOtp}
                 disabled={isLoading}
+                containerClassName="gap-2"
               >
-                <InputOTPGroup>
-                  <InputOTPSlot index={0} />
-                  <InputOTPSlot index={1} />
-                  <InputOTPSlot index={2} />
-                  <InputOTPSlot index={3} />
-                  <InputOTPSlot index={4} />
-                  <InputOTPSlot index={5} />
+                <InputOTPGroup className="gap-2">
+                  <InputOTPSlot
+                    index={0}
+                    className="h-12 w-12 rounded-xl"
+                  />
+                  <InputOTPSlot
+                    index={1}
+                    className="h-12 w-12 rounded-xl"
+                  />
+                  <InputOTPSlot
+                    index={2}
+                    className="h-12 w-12 rounded-xl"
+                  />
+                  <InputOTPSlot
+                    index={3}
+                    className="h-12 w-12 rounded-xl"
+                  />
+                  <InputOTPSlot
+                    index={4}
+                    className="h-12 w-12 rounded-xl"
+                  />
+                  <InputOTPSlot
+                    index={5}
+                    className="h-12 w-12 rounded-xl"
+                  />
                 </InputOTPGroup>
               </InputOTP>
             </div>
           </div>
           <Button
             type="submit"
-            className="w-full"
-            size="lg"
+            className="h-11 w-full rounded-xl border font-medium text-white transition-colors"
             disabled={isLoading || otp.length !== 6}
           >
             {isLoading ? "Verifying..." : "Verify"}
           </Button>
         </form>
-      </CardContent>
-      <CardFooter className="flex flex-col space-y-2 pt-1">
-        <p className="text-sm text-center text-muted-foreground">
+        <p className="mt-6 text-center text-sm">
           Didn&apos;t receive the code?{" "}
           <button
             type="button"
             onClick={handleResend}
             disabled={isResending}
-            className="text-primary hover:underline font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            className="font-medium transition-colors hover:underline disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isResending ? "Resending..." : "Resend code"}
           </button>
         </p>
-      </CardFooter>
+      </CardContent>
     </Card>
   );
 }

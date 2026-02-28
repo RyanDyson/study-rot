@@ -11,8 +11,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { dmSans } from "@/lib/fonts";
-import { cn } from "@/lib/utils";
 import { authClient } from "@/server/better-auth/client";
 import { toast } from "sonner";
 import { useAuthNavigation } from "./auth-context";
@@ -118,35 +116,37 @@ export function ResetPassword() {
     return (
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className={cn("text-3xl", dmSans.className)}>
+          <CardTitle className="font-serif text-3xl font-normal tracking-tight text-white">
             Reset Password
           </CardTitle>
-          <CardDescription className="text-base">
+          <CardDescription className="border-b pb-4 text-sm">
             Enter your email address and we&apos;ll send you a link to reset
             your password
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleRequestReset} className="space-y-4">
+          <form onSubmit={handleRequestReset} className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-sm font-normal">
+                Email
+              </Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="you@example.com"
+                placeholder="user@nextmail.com"
                 value={requestEmail}
                 onChange={(e) => setRequestEmail(e.target.value)}
                 required
                 disabled={isLoading}
+                className="h-11 rounded-xl"
               />
             </div>
             <Button
               type="submit"
-              className="w-full"
-              size="lg"
+              className="h-11 w-full rounded-xl border font-medium text-white transition-colors"
               disabled={isLoading}
             >
-              {isLoading ? "Sending..." : "Send Reset Link"}
+              {isLoading ? "Sending..." : "Reset Password"}
             </Button>
           </form>
         </CardContent>
@@ -157,17 +157,19 @@ export function ResetPassword() {
   return (
     <Card className="w-full max-w-md">
       <CardHeader className="text-center">
-        <CardTitle className={cn("text-3xl", dmSans.className)}>
+        <CardTitle className="font-serif text-3xl font-normal tracking-tight text-white">
           Set New Password
         </CardTitle>
-        <CardDescription className="text-base">
+        <CardDescription className="border-b pb-4 text-sm">
           Enter your new password below
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleResetPassword} className="space-y-4">
+        <form onSubmit={handleResetPassword} className="space-y-5">
           <div className="space-y-2">
-            <Label htmlFor="password">New Password</Label>
+            <Label htmlFor="password" className="text-sm font-normal">
+              New Password
+            </Label>
             <Input
               id="password"
               type="password"
@@ -177,10 +179,16 @@ export function ResetPassword() {
               required
               disabled={isLoading}
               minLength={8}
+              className="h-11 rounded-xl"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirm Password</Label>
+            <Label
+              htmlFor="confirmPassword"
+              className="text-sm font-normal"
+            >
+              Confirm Password
+            </Label>
             <Input
               id="confirmPassword"
               type="password"
@@ -190,12 +198,12 @@ export function ResetPassword() {
               required
               disabled={isLoading}
               minLength={8}
+              className="h-11 rounded-xl"
             />
           </div>
           <Button
             type="submit"
-            className="w-full"
-            size="lg"
+            className="h-11 w-full rounded-xl border font-medium text-white transition-colors"
             disabled={isLoading}
           >
             {isLoading ? "Resetting..." : "Reset Password"}

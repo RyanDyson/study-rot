@@ -13,12 +13,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { dmSans } from "@/lib/fonts";
-import { cn } from "@/lib/utils";
 import { authClient } from "@/server/better-auth/client";
 import { toast } from "sonner";
 import { useAuthNavigation } from "./auth-context";
 import { Mode } from "@/config/auth";
+import { Github } from "lucide-react";
 
 export function SignIn() {
   const { setMode, setEmail: setContextEmail } = useAuthNavigation();
@@ -71,70 +70,72 @@ export function SignIn() {
   return (
     <Card className="w-full max-w-md">
       <CardHeader className="text-center">
-        <CardTitle className={cn("text-3xl", dmSans.className)}>
-          Welcome Back
+        <CardTitle className="font-serif text-3xl font-normal tracking-tight text-white">
+          Login
         </CardTitle>
-        <CardDescription className="text-base">
-          Sign in to continue
+        <CardDescription className="border-b pb-4 text-sm">
+          Welcome back to StudyRot
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email" className="text-sm font-normal">
+              Email
+            </Label>
             <Input
               id="email"
               type="email"
-              placeholder="you@example.com"
+              placeholder="user@nextmail.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
               disabled={isLoading}
+              className="h-11 rounded-xl"
             />
           </div>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" className="text-sm font-normal">
+                Password
+              </Label>
               <button
                 type="button"
                 onClick={() => setMode(Mode.RESET_PASSWORD)}
-                className="text-sm text-primary hover:underline"
+                className="text-sm transition-color hover:underline"
               >
-                Forgot password?
+                Reset Password
               </button>
             </div>
             <Input
               id="password"
               type="password"
-              placeholder="Enter your password"
+              placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
               disabled={isLoading}
+              className="h-11 rounded-xl "
             />
           </div>
           <Button
             type="submit"
-            className="w-full"
-            size="lg"
+            className="h-11 w-full rounded-xl border font-medium text-white transition-colors"
             disabled={isLoading}
           >
-            {isLoading ? "Signing in..." : "Sign In"}
+            {isLoading ? "Signing in..." : "Login"}
           </Button>
         </form>
       </CardContent>
-      <CardFooter className="flex flex-col space-y-2 pt-1">
-        <span className="px-2 flex justify-center text-center text-sm text-muted-foreground">
-          Or continue with
-        </span>
-
+      <CardFooter className="flex flex-col gap-4 border-t border-zinc-700/80 pt-6">
         <Button
           variant="outline"
           type="button"
-          className="w-full"
+          className="flex h-11 w-full items-center justify-center gap-2 rounded-xl border-zinc-600 bg-zinc-900 text-white transition-colors hover:border-zinc-500 hover:bg-zinc-800"
           onClick={handleGitHubSignIn}
         >
-          GitHub
+          <Github className="size-5" />
+          Sign in with GitHub
         </Button>
       </CardFooter>
     </Card>
