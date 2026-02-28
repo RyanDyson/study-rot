@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { mockCourses } from "@/lib/mock-data";
 import { Upload, MessageSquare, BookOpen, Plus } from "lucide-react";
+import { api } from "@/trpc/react";
 
 export default function Dashboard() {
+  const courses = api.knowledgeBase.getAll.useQuery();
   return (
     <div className="flex flex-col gap-8 p-6 lg:p-8">
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -24,7 +26,7 @@ export default function Dashboard() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {mockCourses.map((course) => (
+        {courses.data?.map((course) => (
           <div
             key={course.id}
             className="flex flex-col rounded-2xl border border-border bg-card p-5 backdrop-blur transition hover:border-border hover:bg-accent/50"
@@ -32,14 +34,16 @@ export default function Dashboard() {
             <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-primary/20 text-primary">
               <BookOpen className="h-5 w-5" />
             </div>
-            <h2 className="mb-1 font-semibold text-foreground">{course.title}</h2>
+            <h2 className="mb-1 font-semibold text-foreground">
+              {course.title}
+            </h2>
             <p className="mb-4 text-xs text-muted-foreground line-clamp-2">
               {course.description}
             </p>
             <div className="mt-auto flex flex-wrap gap-2">
-              {course.threadId ? (
+              {course.id ? (
                 <Link
-                  href={`/dashboard/threads/${course.threadId}`}
+                  href={`/dashboard/threads/${course.id}`}
                   className="inline-flex h-7 items-center gap-1.5 rounded-full bg-primary px-2.5 text-[0.8rem] font-medium text-primary-foreground transition hover:opacity-90"
                 >
                   <MessageSquare className="h-3.5 w-3.5" />
@@ -59,7 +63,7 @@ export default function Dashboard() {
                 className="inline-flex h-7 items-center gap-1.5 rounded-full px-2.5 text-[0.8rem] font-medium text-muted-foreground transition hover:bg-accent hover:text-foreground"
               >
                 <Upload className="h-3.5 w-3.5" />
-                {course.threadId ? "Add More Files" : "Upload"}
+                {course.id ? "Add More Files" : "Upload"}
               </Link>
             </div>
           </div>

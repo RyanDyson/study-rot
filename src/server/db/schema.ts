@@ -75,7 +75,8 @@ export const twoFactor = pgTable("two_factor", {
 
 export const knowledgeBase = pgTable("knowledge_base", {
   id: uuid("id").primaryKey().defaultRandom(),
-  name: text("name").notNull(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
   createdAt: timestamp("created_at").$defaultFn(
     () => /* @__PURE__ */ new Date(),
   ),
