@@ -11,8 +11,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <AppSidebar />
       <SidebarInset>
         <AppHeader />
+        <main className="flex-1 overflow-auto">{children}</main>
       </SidebarInset>
-      <main>{children}</main>
     </SidebarProvider>
   );
 }
