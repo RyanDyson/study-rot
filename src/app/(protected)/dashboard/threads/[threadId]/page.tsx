@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getThread } from "@/lib/mock-data";
 import { ArrowLeft, MessageCircle } from "lucide-react";
 import { ThreadTweetCard } from "./thread-tweet-card";
+import { api } from "@/trpc/server";
 
 interface PageProps {
   params: Promise<{ threadId: string }>;
@@ -10,15 +11,15 @@ interface PageProps {
 
 export default async function ThreadPage({ params }: PageProps) {
   const { threadId } = await params;
-  const thread = getThread(threadId);
+  const thread = await api.thread.getAllThreads(threadId);
 
   if (!thread) notFound();
 
-  const sortedTweets = [...thread.tweets].sort((a, b) => a.order - b.order);
+  const sortedTweets = thread
 
   return (
     <div className="flex min-h-screen flex-col">
-      <div className="sticky top-0 z-10 border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
+      {/* <div className="sticky top-0 z-10 border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
         <div className="flex items-center gap-4 p-4">
           <Link
             href="/dashboard"
@@ -38,7 +39,7 @@ export default async function ThreadPage({ params }: PageProps) {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
       <div className="flex-1 pb-20">
         <div className="mx-auto w-full max-w-2xl">

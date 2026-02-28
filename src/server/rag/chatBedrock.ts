@@ -55,5 +55,5 @@ export const converseWithChatBedrock = async (
     },
   ]);
 
-  return response;
+  return response.text;
 };

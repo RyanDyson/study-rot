@@ -4,7 +4,7 @@ import { getSession } from "@/server/better-auth/server";
 import { HydrateClient } from "@/trpc/server";
 
 export default async function Home() {
-  const session = await getSession();
+  //const session = await getSession();
 
   return (
     <HydrateClient>
