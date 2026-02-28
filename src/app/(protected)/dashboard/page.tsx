@@ -1,7 +1,10 @@
 "use client";
 import { api } from "@/trpc/react";
 import { UploadDialog } from "@/components/global/upload-dialog";
-import { CourseCard, CourseCardSkeleton } from "@/components/global/course-card";
+import {
+  CourseCard,
+  CourseCardSkeleton,
+} from "@/components/global/course-card";
 
 export default function Dashboard() {
   const {
@@ -9,11 +12,11 @@ export default function Dashboard() {
     isLoading,
     refetch,
   } = api.knowledgeBase.getAll.useQuery();
+  console.log(courses);
 
-  
   return (
     <div className="relative flex h-full flex-col gap-8 p-6 lg:p-8">
-      <UploadDialog />
+      <UploadDialog refetch={refetch} />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {isLoading

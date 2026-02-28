@@ -37,10 +37,10 @@ export function CourseCard({
     <Link href={`/dashboard/${slug}`}>
       <Card className="@container/card shadow-none border-primary/20 w-full h-full flex flex-col justify-between hover:to-primary/50 transition-colors cursor-pointer bg-linear-to-b from-card to-primary/20 hover:border-primary/50">
         <CardHeader>
-          <CardDescription>{description}</CardDescription>
-          <CardTitle className="text-lg font-semibold tabular-nums @[250px]/card:text-3xl">
+          <CardTitle className="font-serif text-lg font-semibold tabular-nums @[250px]/card:text-3xl">
             {title}
           </CardTitle>
+          <CardDescription>{description}</CardDescription>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium">{createdAt}</div>

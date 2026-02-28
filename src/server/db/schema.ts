@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { boolean, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { boolean, pgTable, text, timestamp, uuid, integer } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -93,6 +93,14 @@ export const knowledgeFiles = pgTable("knowledgeFiles", {
   ocrStatus: text("ocr_status").$defaultFn(() => "pending").notNull(),
   extractedText: text("extracted_text"),
 });
+
+// export const threads = pgTable("threads", {
+//   id: uuid("id").primaryKey().defaultRandom(),
+//   content: text("content").notNull(),
+//   author: text("author").notNull(),
+//   handle: text("handle").notNull(),
+//   likes: integer("likes").notNull(),
+// })
 
 export const userRelations = relations(user, ({ many }) => ({
   account: many(account),

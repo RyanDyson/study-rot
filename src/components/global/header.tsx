@@ -1,7 +1,5 @@
 "use client";
 
-import { Separator } from "@/components/ui/separator";
-import { SidebarTrigger } from "@/components/ui/sidebar";
 import { usePathname } from "next/navigation";
 import {
   Breadcrumb,
@@ -84,13 +82,8 @@ export function AppHeader() {
   const breadcrumbs = BreadCrumbGenerator(pathname);
 
   return (
-    <header className="bg-background/70 backdrop-blur-2xl flex h-(--header-height) shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">
-      <div className="py-1 flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6 ">
-        <SidebarTrigger className="-ml-1" />
-        <Separator
-          orientation="vertical"
-          className="mx-2 data-[orientation=vertical]:h-4"
-        />
+    <header className="flex h-10 shrink-0 items-center border-b border-border bg-background/70 px-4 backdrop-blur-2xl lg:px-6">
+      <div className="flex w-full items-center">
         <Breadcrumb>
           <BreadcrumbList>
             {breadcrumbs.map((breadcrumb, index) => (

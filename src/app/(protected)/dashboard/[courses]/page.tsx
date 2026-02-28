@@ -2,81 +2,51 @@
 
 import { use, useState } from "react";
 import Link from "next/link";
-import { getCourse, getThread } from "@/lib/mock-data";
+import { api } from "@/trpc/react";
 import { Pattern as FileUploadTable } from "@/components/patterns/p-file-upload-6";
-import { formatBytes, type FileMetadata } from "@/hooks/use-file-upload";
+import { type FileMetadata } from "@/hooks/use-file-upload";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, BookOpen } from "lucide-react";
+import { ArrowLeft, BookOpen, Loader2 } from "lucide-react";
 import { StatsCard } from "@/components/global/stats-card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface PageProps {
   params: Promise<{ courses: string }>;
 }
-const MOCK_FILES: FileMetadata[] = [
-  {
-    id: "f1",
-    name: "lecture-notes-week1.pdf",
-    size: 2_516_582,
-    type: "application/pdf",
-    url: "",
-  },
-  {
-    id: "f2",
-    name: "syllabus.pdf",
-    size: 524_288,
-    type: "application/pdf",
-    url: "",
-  },
-  {
-    id: "f3",
-    name: "homework-solutions.docx",
-    size: 1_153_434,
-    type: "application/msword",
-    url: "",
-  },
-];
 
-// ─── small helpers ────────────────────────────────────────────────────────────
-function formatDate(iso: string) {
+function formatDate(date: Date | null | undefined) {
+  if (!date) return null;
   return new Intl.DateTimeFormat("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  }).format(new Date(iso));
+  }).format(new Date(date));
 }
-
-type StatsCardAccent = "green" | "red" | "default";
-
-const accentClasses: Record<StatsCardAccent, string> = {
-  green: "bg-emerald-500/10 text-emerald-500",
-  red: "bg-destructive/10 text-destructive",
-  default: "bg-primary/10 text-primary",
-};
 
 export default function CoursePage({ params }: PageProps) {
   const { courses: courseId } = use(params);
 
-  const course = getCourse(courseId);
-  const thread = course?.threadId ? getThread(course.threadId) : null;
+  const { data: course, isLoading } =
+    api.knowledgeBase.getById.useQuery(courseId);
 
   const [isGenerating, setIsGenerating] = useState(false);
-  const [files, setFiles] = useState<FileMetadata[]>(MOCK_FILES);
-
-  const totalSize = files.reduce((acc, f) => acc + f.size, 0);
-  const lastUpload = course?.uploadedAt
-    ? formatDate(course.uploadedAt)
-    : "No files yet";
-  const lastGenerated = thread?.generatedAt
-    ? formatDate(thread.generatedAt)
-    : null;
 
   const handleGenerate = () => {
     setIsGenerating(true);
-    // Wire up your real generation call here
     setTimeout(() => setIsGenerating(false), 2000);
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-full flex-col gap-8 p-6 lg:p-8">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Skeleton className="h-28 rounded-2xl" />
+          <Skeleton className="h-28 rounded-2xl" />
+        </div>
+        <Skeleton className="h-64 rounded-2xl" />
+      </div>
+    );
+  }
 
   if (!course) {
     return (
@@ -96,42 +66,69 @@ export default function CoursePage({ params }: PageProps) {
     );
   }
 
+  const sortedFiles = [...course.files].sort(
+    (a, b) =>
+      new Date(b.createdAt ?? 0).getTime() -
+      new Date(a.createdAt ?? 0).getTime(),
+  );
+  const lastUploadDate = formatDate(sortedFiles[0]?.createdAt);
+
+  const initialFiles: FileMetadata[] = course.files.map((f) => ({
+    id: f.id,
+    name: f.name,
+    size: 0,
+    type: "",
+    url: "",
+  }));
+
   return (
     <div className="flex min-h-full flex-col">
-      <div className="flex flex-1 flex-col gap-8 p-6 pb-32 lg:p-8 lg:pb-32">
-        {/* ── stats ───────────────────────────────────────────────────── */}
+      {/* ── sticky header ─────────────────────────────────────────── */}
+      <div className="sticky top-0 z-10 border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
+        <div className="flex items-center gap-4 px-6 py-4">
+          <Link
+            href="/dashboard"
+            className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-muted-foreground transition hover:bg-accent hover:text-foreground"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Link>
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <BookOpen className="h-4 w-4" />
+            </div>
+            <div className="min-w-0">
+              <h1 className="truncate text-base font-semibold text-foreground">
+                {course.title}
+              </h1>
+              <p className="truncate text-xs text-muted-foreground">
+                {course.description}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-1 flex-col gap-8 p-6 lg:p-8">
+        {/* ── stats ─────────────────────────────────────────────────── */}
         <section>
           <h2 className="mb-3 text-sm font-medium">Overview</h2>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-3 sm:grid-cols-2">
             <StatsCard
               label="Files"
-              stat={String(files.length)}
+              stat={String(course.files.length)}
               description="in the knowledge base"
             />
             <StatsCard
-              label="Total size"
-              stat={formatBytes(totalSize)}
-              description="across all files"
-            />
-            <StatsCard
               label="Last upload"
-              stat={course.uploadedAt ? lastUpload.split(",")[0]! : "—"}
+              stat={lastUploadDate ?? "—"}
               description={
-                course.uploadedAt
-                  ? lastUpload.split(",").slice(1).join(",").trim()
-                  : "No uploads yet"
-              }
-            />
-            <StatsCard
-              label="Thread"
-              stat={thread ? "Generated" : "Not yet"}
-              description={
-                lastGenerated ? `Last: ${lastGenerated}` : "No thread yet"
+                lastUploadDate ? "most recent file added" : "No files yet"
               }
             />
           </div>
         </section>
 
+        {/* ── knowledge base ─────────────────────────────────────────── */}
         <section>
           <div className="mb-4">
             <h2 className="text-sm font-medium text-foreground">
@@ -149,26 +146,23 @@ export default function CoursePage({ params }: PageProps) {
               maxSize={50 * 1024 * 1024}
               accept="*"
               multiple
-              initialFiles={files}
+              initialFiles={initialFiles}
               simulateUpload={false}
-              onFilesChange={(updated) => {
-                // Wire up your real file list sync here
-                setFiles(
-                  updated.map((f) => ({
-                    id: f.id,
-                    name: f.file.name,
-                    size: f.file.size,
-                    type:
-                      f.file instanceof File
-                        ? f.file.type
-                        : (f.file.type ?? ""),
-                    url: f.file instanceof File ? "" : (f.file.url ?? ""),
-                  })),
-                );
-              }}
             />
           </div>
         </section>
+
+        {/* ── generate ───────────────────────────────────────────────── */}
+        <div className="flex justify-end">
+          <Button
+            disabled={isGenerating || course.files.length === 0}
+            onClick={handleGenerate}
+            className="gap-2"
+          >
+            {isGenerating && <Loader2 className="h-4 w-4 animate-spin" />}
+            {isGenerating ? "Generating…" : "Generate Thread"}
+          </Button>
+        </div>
       </div>
     </div>
   );

@@ -1,18 +1,12 @@
-import { AppSidebar } from "@/components/global/sidebar";
-import {
-  SidebarProvider,
-  SidebarInset,
-} from "@/components/ui/sidebar";
+import { AppNavbar } from "@/components/global/sidebar";
 import { AppHeader } from "@/components/global/header";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset>
-        <AppHeader />
-        <main className="flex flex-1 flex-col">{children}</main>
-      </SidebarInset>
-    </SidebarProvider>
+    <div className="flex h-screen flex-col">
+      <AppNavbar />
+      {/* <AppHeader /> */}
+      <main className="flex flex-1 h-full flex-col">{children}</main>
+    </div>
   );
 }

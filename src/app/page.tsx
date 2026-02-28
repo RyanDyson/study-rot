@@ -7,7 +7,7 @@ import { Sparkles } from "lucide-react";
 import { Iphone } from "@/components/ui/iphone";
 
 export default async function Home() {
-  const session = await getSession();
+  //const session = await getSession();
 
   return (
     <HydrateClient>

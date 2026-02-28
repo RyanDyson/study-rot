@@ -6,7 +6,7 @@ import { Pattern as TableUpload } from "@/components/patterns/p-file-upload-6";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Sparkles, Plus } from "lucide-react";
+import { Sparkles, Plus, Loader2 } from "lucide-react";
 import type { FileWithPreview } from "@/hooks/use-file-upload";
 import { api } from "@/trpc/react";
 import {
@@ -33,12 +33,13 @@ async function uploadFile(fileWithPreview: FileWithPreview, id: string) {
   return res.json();
 }
 
-export function UploadDialog() {
+export function UploadDialog({ refetch }: { refetch: () => void }) {
   const filesRef = useRef<FileWithPreview[]>([]);
 
+  const [open, setOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [courseName, setCourseName] = useState("");
   const [courseDescription, setCourseDescription] = useState("");
-  const [knowledgeBaseId, setKnowledgeBaseId] = useState<string | null>(null);
   const { mutateAsync } = api.knowledgeBase.create.useMutation();
 
   const handleFilesChange = (files: FileWithPreview[]) => {
@@ -47,24 +48,35 @@ export function UploadDialog() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    const result = await mutateAsync({
-      title: courseName,
-      description: courseDescription,
-    });
-    setKnowledgeBaseId(result.id);
-    for (const fileWithPreview of filesRef.current) {
-      if (fileWithPreview.file instanceof File) {
-        await uploadFile(fileWithPreview, result.id);
+    setIsSubmitting(true);
+    try {
+      const result = await mutateAsync({
+        title: courseName,
+        description: courseDescription,
+      });
+      for (const fileWithPreview of filesRef.current) {
+        if (fileWithPreview.file instanceof File) {
+          await uploadFile(fileWithPreview, result.id);
+        }
       }
+      refetch();
+      setOpen(false);
+      setCourseName("");
+      setCourseDescription("");
+      filesRef.current = [];
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="absolute bottom-4 right-4 gap-1.5">
-          <Plus className="h-4 w-4" />
+        <Button
+          size="lg"
+          className="absolute bottom-6 right-6 gap-2 rounded-full shadow-lg shadow-primary/30 hover:shadow-primary/50 hover:scale-105 transition-all duration-200"
+        >
+          <Plus className="h-5 w-5" />
           New course
         </Button>
       </DialogTrigger>
@@ -89,6 +101,7 @@ export function UploadDialog() {
                 placeholder="e.g. Intro to Machine Learning"
                 value={courseName}
                 onChange={(e) => setCourseName(e.target.value)}
+                disabled={isSubmitting}
                 required
               />
             </div>
@@ -101,6 +114,7 @@ export function UploadDialog() {
                 placeholder="e.g. Overfitting, regularization, and validation"
                 value={courseDescription}
                 onChange={(e) => setCourseDescription(e.target.value)}
+                disabled={isSubmitting}
                 required
               />
             </div>
@@ -120,9 +134,17 @@ export function UploadDialog() {
           </div>
 
           <DialogFooter className="border-t border-border px-6 py-4">
-            <Button type="submit" className="w-full gap-2">
-              <Sparkles className="h-4 w-4" />
-              Create Course
+            <Button
+              type="submit"
+              className="w-full gap-2"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Sparkles className="h-4 w-4" />
+              )}
+              {isSubmitting ? "Creating…" : "Create Course"}
             </Button>
           </DialogFooter>
         </form>

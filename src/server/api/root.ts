@@ -1,5 +1,6 @@
 import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc";
 import { knowledgeBaseRouter } from "./router/knowledgeBaseRouter";
+import { threadRouter } from "./router/threadRouter";
 
 /**
  * This is the primary router for your server.
@@ -9,7 +10,8 @@ import { knowledgeBaseRouter } from "./router/knowledgeBaseRouter";
 export const appRouter = createTRPCRouter({
   //import routes here
   //.e.g user: userRouter
-  knowledgeBase: knowledgeBaseRouter
+  knowledgeBase: knowledgeBaseRouter,
+  thread: threadRouter
 });
 
 // export type definition of API
