@@ -3,8 +3,6 @@ import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { db } from "@/server/db";
 import { eq } from "drizzle-orm";
 import { knowledgeBase, knowledgeFiles } from "@/server/db/schema";
-import { converseWithChatBedrock } from "@/server/rag/chatBedrock";
-import { ContentBlock } from "@langchain/core/messages";
 
 export type Thread = {
     id: string,
@@ -60,7 +58,7 @@ export const threadRouter = createTRPCRouter({
                         user_id: ctx.session.user.id,
                         document_string: doc.name
                     }
-                const newChat = await fetch("http://98.80.142.177:8000/chat_model", {
+                const newChat = await fetch(process.env.AI_ENDPOINT + "/chat_model", {
                     method: "POST",
                     headers: {
                         "accept": "application/json",
