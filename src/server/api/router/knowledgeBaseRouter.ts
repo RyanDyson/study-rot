@@ -71,7 +71,7 @@ export const knowledgeBaseRouter = createTRPCRouter({
       z.object({
         id: z.string(),
         name: z.string(),
-        
+
         files: z.array(z.instanceof(File)),
       }),
     )
@@ -88,10 +88,12 @@ export const knowledgeBaseRouter = createTRPCRouter({
       // Insert files into DB
       const inserted = await db
         .insert(knowledgeFiles)
-        .values(input.files.map((file) => ({
-          name: file.name,
-          knowledgeBaseId: input.id,
-        })))
+        .values(
+          input.files.map((file) => ({
+            name: file.name,
+            knowledgeBaseId: input.id,
+          })),
+        )
         .returning({ id: knowledgeFiles.id });
       return inserted;
     }),
