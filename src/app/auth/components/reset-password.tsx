@@ -138,12 +138,12 @@ export function ResetPassword() {
                 onChange={(e) => setRequestEmail(e.target.value)}
                 required
                 disabled={isLoading}
-                className="h-11 rounded-xl"
+                className="h-11 rounded-sm"
               />
             </div>
             <Button
               type="submit"
-              className="h-11 w-full rounded-xl border font-medium text-white transition-colors"
+              className="h-11 w-full rounded-sm border font-medium text-white transition-colors"
               disabled={isLoading}
             >
               {isLoading ? "Sending..." : "Reset Password"}
@@ -179,14 +179,11 @@ export function ResetPassword() {
               required
               disabled={isLoading}
               minLength={8}
-              className="h-11 rounded-xl"
+              className="h-11 rounded-sm"
             />
           </div>
           <div className="space-y-2">
-            <Label
-              htmlFor="confirmPassword"
-              className="text-sm font-normal"
-            >
+            <Label htmlFor="confirmPassword" className="text-sm font-normal">
               Confirm Password
             </Label>
             <Input
@@ -198,12 +195,12 @@ export function ResetPassword() {
               required
               disabled={isLoading}
               minLength={8}
-              className="h-11 rounded-xl"
+              className="h-11 rounded-sm"
             />
           </div>
           <Button
             type="submit"
-            className="h-11 w-full rounded-xl border font-medium text-white transition-colors"
+            className="h-11 w-full rounded-sm border font-medium text-white transition-colors"
             disabled={isLoading}
           >
             {isLoading ? "Resetting..." : "Reset Password"}

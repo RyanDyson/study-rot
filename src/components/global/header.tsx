@@ -21,25 +21,24 @@ interface BreadcrumbSegment {
 const BreadCrumbGenerator = (pathname: string): BreadcrumbSegment[] => {
   if (pathname === "/") {
     return [
-      {
-        label: "Dashboard",
-        href: "/",
-        isLast: true,
-      },
+      { label: "Home", href: "/", isLast: true },
     ];
   }
 
   const segments = pathname.split("/").filter(Boolean);
+  const isDashboard = segments[0] === "dashboard";
+  const rootHref = isDashboard ? "/dashboard" : "/";
 
   const breadcrumbs: BreadcrumbSegment[] = [
     {
-      label: "Dashboard",
-      href: "/",
-      isLast: false,
+      label: isDashboard ? "Dashboard" : segments[0] ?? "Dashboard",
+      href: rootHref,
+      isLast: segments.length <= 1,
     },
   ];
 
-  for (let i = 0; i < segments.length; i++) {
+  const startIndex = isDashboard ? 1 : 0;
+  for (let i = startIndex; i < segments.length; i++) {
     const segment = segments[i];
     if (!segment) continue;
 

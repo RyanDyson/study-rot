@@ -83,9 +83,7 @@ export function OTP() {
         </CardTitle>
         <CardDescription className="border-b pb-4 text-sm">
           Enter the 6-digit code sent to{" "}
-          {email && (
-            <span className="font-semibold">{email}</span>
-          )}
+          {email && <span className="font-semibold">{email}</span>}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -105,38 +103,20 @@ export function OTP() {
                 disabled={isLoading}
                 containerClassName="gap-2"
               >
-                <InputOTPGroup className="gap-2">
-                  <InputOTPSlot
-                    index={0}
-                    className="h-12 w-12 rounded-xl"
-                  />
-                  <InputOTPSlot
-                    index={1}
-                    className="h-12 w-12 rounded-xl"
-                  />
-                  <InputOTPSlot
-                    index={2}
-                    className="h-12 w-12 rounded-xl"
-                  />
-                  <InputOTPSlot
-                    index={3}
-                    className="h-12 w-12 rounded-xl"
-                  />
-                  <InputOTPSlot
-                    index={4}
-                    className="h-12 w-12 rounded-xl"
-                  />
-                  <InputOTPSlot
-                    index={5}
-                    className="h-12 w-12 rounded-xl"
-                  />
+                <InputOTPGroup>
+                  <InputOTPSlot index={0} className="h-12 w-12" />
+                  <InputOTPSlot index={1} className="h-12 w-12" />
+                  <InputOTPSlot index={2} className="h-12 w-12" />
+                  <InputOTPSlot index={3} className="h-12 w-12" />
+                  <InputOTPSlot index={4} className="h-12 w-12" />
+                  <InputOTPSlot index={5} className="h-12 w-12" />
                 </InputOTPGroup>
               </InputOTP>
             </div>
           </div>
           <Button
             type="submit"
-            className="h-11 w-full rounded-xl border font-medium text-white transition-colors"
+            className="h-11 w-full border font-medium text-white transition-colors"
             disabled={isLoading || otp.length !== 6}
           >
             {isLoading ? "Verifying..." : "Verify"}

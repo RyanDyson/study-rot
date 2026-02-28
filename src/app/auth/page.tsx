@@ -19,7 +19,7 @@ export default function AuthPage() {
     <AuthContext.Provider value={{ mode, setMode, email, setEmail }}>
       <div className="min-w-screen h-screen flex items-center justify-center">
         <div className="hidden lg:flex items-center w-1/2 h-full  bg-linear-to-br from-primary to-secondary">
-          <div className="-translate-x-32 p-1 bg-neutral-300/90 border-2 backdrop-blur-xl rounded-xl border-neutral-400 flex flex-col items-center justify-center">
+          <div className="-translate-x-32 p-1 bg-neutral-300/90 border-2 backdrop-blur-xl rounded-sm border-neutral-400 flex flex-col items-center justify-center">
             <div className="w-full gap-x-1 pb-2 pt-1 px-4 items-center justify-end flex">
               <div className="bg-emerald-200 border border-emerald-500 rounded-full h-3 w-3" />
               <div className="bg-amber-200 border border-amber-500 rounded-full h-3 w-3" />

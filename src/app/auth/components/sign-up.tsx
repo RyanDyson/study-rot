@@ -123,7 +123,7 @@ export function SignUp() {
               onChange={(e) => setName(e.target.value)}
               required
               disabled={isLoading}
-              className="h-11 rounded-xl"
+              className="h-11 rounded-sm"
             />
           </div>
           <div className="space-y-2">
@@ -138,7 +138,7 @@ export function SignUp() {
               onChange={(e) => setEmail(e.target.value)}
               required
               disabled={isLoading}
-              className="h-11 rounded-xl"
+              className="h-11 rounded-sm"
             />
           </div>
           <div className="space-y-2">
@@ -153,14 +153,11 @@ export function SignUp() {
               onChange={(e) => setPassword(e.target.value)}
               required
               disabled={isLoading}
-              className="h-11 rounded-xl"
+              className="h-11 rounded-sm"
             />
           </div>
           <div className="space-y-2">
-            <Label
-              htmlFor="confirmPassword"
-              className="text-sm font-normal"
-            >
+            <Label htmlFor="confirmPassword" className="text-sm font-normal">
               Confirm Password
             </Label>
             <Input
@@ -171,12 +168,12 @@ export function SignUp() {
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
               disabled={isLoading}
-              className="h-11 rounded-xl"
+              className="h-11 rounded-sm"
             />
           </div>
           <Button
             type="submit"
-            className="h-11 w-full rounded-xl border font-medium text-white transition-colors"
+            className="h-11 w-full rounded-sm border font-medium text-white transition-colors"
             disabled={isLoading}
           >
             {isLoading ? "Creating account..." : "Sign Up"}
@@ -187,7 +184,7 @@ export function SignUp() {
         <Button
           variant="outline"
           type="button"
-          className="flex h-11 w-full items-center justify-center gap-2 rounded-xl border-zinc-600 bg-zinc-900 text-white transition-colors hover:border-zinc-500 hover:bg-zinc-800"
+          className="flex h-11 w-full items-center justify-center gap-2 rounded-sm border-zinc-600 bg-zinc-900 text-white transition-colors hover:border-zinc-500 hover:bg-zinc-800"
           onClick={handleGitHubSignIn}
         >
           <Github className="size-5" />
