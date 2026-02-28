@@ -1,12 +1,5 @@
 import { relations } from "drizzle-orm";
-import {
-  boolean,
-  index,
-  pgTable,
-  pgTableCreator,
-  text,
-  timestamp,
-} from "drizzle-orm/pg-core";
+import { boolean, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -21,6 +14,9 @@ export const user = pgTable("user", {
     .notNull(),
   updatedAt: timestamp("updated_at")
     .$defaultFn(() => /* @__PURE__ */ new Date())
+    .notNull(),
+  twoFactorEnabled: boolean("two_factor_enabled")
+    .$defaultFn(() => false)
     .notNull(),
 });
 
@@ -68,9 +64,37 @@ export const verification = pgTable("verification", {
   ),
 });
 
+export const twoFactor = pgTable("two_factor", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  secret: text("secret").notNull(),
+  backupCodes: text("backup_codes").notNull(),
+});
+
+export const knowledgeBase = pgTable("knowledge_base", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  createdAt: timestamp("created_at").$defaultFn(
+    () => /* @__PURE__ */ new Date(),
+  ),
+  userId: text("user_id").notNull().references(() => user.id, {onDelete: "cascade"})
+});
+
+export const knowledgeFiles = pgTable("knowledgeFiles", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  createdAt: timestamp("created_at").$defaultFn(
+    () => /* @__PURE__ */ new Date(),
+  ),
+  knowledgeBaseId: uuid("knowledge_base_id").notNull().references(() => knowledgeBase.id, {onDelete: 'cascade'})
+});
+
 export const userRelations = relations(user, ({ many }) => ({
   account: many(account),
   session: many(session),
+  knowledgeBase: many(knowledgeBase)
 }));
 
 export const accountRelations = relations(account, ({ one }) => ({
@@ -80,3 +104,12 @@ export const accountRelations = relations(account, ({ one }) => ({
 export const sessionRelations = relations(session, ({ one }) => ({
   user: one(user, { fields: [session.userId], references: [user.id] }),
 }));
+
+export const knowledgeBaseRelations = relations(knowledgeBase, ({one, many}) => ({
+  user: one(user, { fields: [knowledgeBase.userId], references: [user.id] }),
+  files: many(knowledgeFiles)
+}))
+
+export const knowledgeFilesRelations = relations(knowledgeFiles, ({one}) => ({
+  knowledgeBase: one(knowledgeBase, {fields: [knowledgeFiles.id], references: [knowledgeBase.id]})
+}))
