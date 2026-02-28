@@ -115,17 +115,17 @@ export function ResetPassword() {
   if (step === "request") {
     return (
       <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="font-serif text-3xl font-normal tracking-tight text-white">
+        <CardHeader className="text-left px-0 ">
+          <CardTitle className="font-serif px-6 text-3xl font-normal tracking-tight text-white">
             Reset Password
           </CardTitle>
-          <CardDescription className="border-b pb-4 text-sm">
+          <CardDescription className="border-b pb-4 px-6 text-sm">
             Enter your email address and we&apos;ll send you a link to reset
             your password
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleRequestReset} className="space-y-5">
+          <form onSubmit={handleRequestReset} className="space-y-3">
             <div className="space-y-2">
               <Label htmlFor="email" className="text-sm font-normal">
                 Email
@@ -138,12 +138,12 @@ export function ResetPassword() {
                 onChange={(e) => setRequestEmail(e.target.value)}
                 required
                 disabled={isLoading}
-                className="h-11 rounded-sm"
+                className="h-11 rounded-full"
               />
             </div>
             <Button
               type="submit"
-              className="h-11 w-full rounded-sm border font-medium text-white transition-colors"
+              className="h-11 w-full rounded-full border font-medium text-white transition-colors"
               disabled={isLoading}
             >
               {isLoading ? "Sending..." : "Reset Password"}
@@ -155,7 +155,7 @@ export function ResetPassword() {
   }
 
   return (
-    <Card className="w-full max-w-md">
+    <Card className="w-full max-w-md px-0">
       <CardHeader className="text-center">
         <CardTitle className="font-serif text-3xl font-normal tracking-tight text-white">
           Set New Password

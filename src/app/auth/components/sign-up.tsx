@@ -100,12 +100,12 @@ export function SignUp() {
   };
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader className="text-center">
-        <CardTitle className="font-serif text-3xl font-normal tracking-tight text-white">
+    <Card className="w-full max-w-md px-0">
+      <CardHeader className="text-left px-0">
+        <CardTitle className="font-serif px-6 text-3xl font-normal tracking-tight text-white">
           Create account
         </CardTitle>
-        <CardDescription className="border-b pb-4 text-sm">
+        <CardDescription className="border-b pb-4 px-6 text-sm">
           Join StudyRot and rot your way to 4.0 GPA
         </CardDescription>
       </CardHeader>

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getThread } from "@/lib/mock-data";
 import { ArrowLeft, MessageCircle } from "lucide-react";
-import { ThreadTweetCard } from "./thread-tweet-card";
+import { ThreadTweetCard } from "../../../threads/[threadId]/thread-tweet-card";
 
 interface PageProps {
   params: Promise<{ threadId: string }>;

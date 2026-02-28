@@ -33,8 +33,8 @@ export const Navbar = () => {
             href="/dashboard"
             className="flex items-center justify-center mx-0"
           >
-            <Button className="cursor-pointer flex items-center gap-x-2 min-h-fit min-w-fit py-2  rounded-full">
-              <Avatar>
+            <Button className="cursor-pointer flex items-center gap-x-2 p-4 rounded-full">
+              <Avatar className="size-8">
                 <AvatarImage src={session.user?.image ?? ""} />
                 <AvatarFallback>{session.user?.name?.charAt(0)}</AvatarFallback>
               </Avatar>
@@ -72,7 +72,7 @@ export const Navbar = () => {
                 <Link
                   href={nav.href}
                   key={index}
-                  className="rounded-full p-2 leading-none transition-colors duration-100 hover:text-zinc-300 active:bg-zinc-50 active:text-zinc-950"
+                  className="rounded-full p-2  leading-none transition-colors duration-100 hover:text-zinc-300 active:bg-zinc-50 active:text-zinc-950"
                 >
                   {nav.label}
                 </Link>

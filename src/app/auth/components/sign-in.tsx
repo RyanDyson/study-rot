@@ -68,17 +68,17 @@ export function SignIn() {
   };
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader className="text-center">
-        <CardTitle className="font-serif text-3xl font-normal tracking-tight text-white">
+    <Card className="w-full max-w-md px-0">
+      <CardHeader className="text-left px-0">
+        <CardTitle className="font-serif px-6 text-3xl font-normal tracking-tight text-white">
           Login
         </CardTitle>
-        <CardDescription className="border-b pb-4 text-sm">
+        <CardDescription className="border-b px-6 pb-2 text-sm">
           Welcome back to StudyRot
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-3">
           <div className="space-y-2">
             <Label htmlFor="email" className="text-sm font-normal">
               Email
@@ -91,7 +91,7 @@ export function SignIn() {
               onChange={(e) => setEmail(e.target.value)}
               required
               disabled={isLoading}
-              className="h-11 rounded-sm"
+              className="h-11 rounded-full"
             />
           </div>
           <div className="space-y-2">
@@ -102,7 +102,7 @@ export function SignIn() {
               <button
                 type="button"
                 onClick={() => setMode(Mode.RESET_PASSWORD)}
-                className="text-sm transition-color hover:underline"
+                className="cursor-pointer text-muted-foreground text-sm transition-color hover:underline"
               >
                 Reset Password
               </button>
@@ -115,12 +115,12 @@ export function SignIn() {
               onChange={(e) => setPassword(e.target.value)}
               required
               disabled={isLoading}
-              className="h-11 rounded-sm "
+              className="h-11 rounded-full"
             />
           </div>
           <Button
             type="submit"
-            className="h-11 w-full rounded-sm border font-medium text-white transition-colors"
+            className="h-11 w-full rounded-full border font-medium text-white transition-colors"
             disabled={isLoading}
           >
             {isLoading ? "Signing in..." : "Login"}
@@ -131,7 +131,7 @@ export function SignIn() {
         <Button
           variant="outline"
           type="button"
-          className="flex h-11 w-full items-center justify-center gap-2 rounded-sm border-zinc-600 bg-zinc-900 text-white transition-colors hover:border-zinc-500 hover:bg-zinc-800"
+          className="flex h-11 w-full items-center justify-center gap-2 rounded-full border-zinc-600 bg-zinc-900 text-white transition-colors hover:border-zinc-500 hover:bg-zinc-800"
           onClick={handleGitHubSignIn}
         >
           <Github className="size-5" />
