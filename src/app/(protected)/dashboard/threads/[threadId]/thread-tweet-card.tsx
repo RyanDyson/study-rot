@@ -10,9 +10,10 @@ import {
   Send,
   MoreHorizontal,
 } from "lucide-react";
+import { type Thread } from "@/server/api/router/threadRouter";
 
 interface ThreadTweetCardProps {
-  tweet: ThreadTweet;
+  tweet: Thread;
   depth?: number;
   isLast?: boolean;
   showConnector?: boolean;
@@ -42,10 +43,10 @@ export function ThreadTweetCard({
         <div
           className={cn(
             "h-9 w-9 rounded-full flex items-center justify-center text-primary-foreground font-semibold text-xs shrink-0",
-            tweet.avatarColor,
+            "bg-primary"
           )}
         >
-          {tweet.author.charAt(0)}
+          {tweet.author?.charAt(0)}
         </div>
         {(showConnector || (hasReplies && showReplies)) && (
           <div className="mt-1 w-0.5 flex-1 bg-border/60" />
@@ -58,7 +59,7 @@ export function ThreadTweetCard({
             <span className="font-semibold text-sm text-foreground">
               {tweet.author}
             </span>
-            {tweet.type && typeLabels[tweet.type] && (
+            {/* {tweet.type && typeLabels[tweet.type] && (
               <span
                 className={cn(
                   "rounded px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-wider",
@@ -75,10 +76,10 @@ export function ThreadTweetCard({
               >
                 {typeLabels[tweet.type]}
               </span>
-            )}
+            )} */}
           </div>
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span>{tweet.timestamp}</span>
+            {/* <span>{tweet.timestamp}</span> */}
             <button className="hover:bg-muted rounded-full p-1 transition">
               <MoreHorizontal className="h-4 w-4" />
             </button>
@@ -119,9 +120,9 @@ export function ThreadTweetCard({
             className="group flex items-center gap-1.5 transition hover:text-info"
           >
             <MessageCircle className="h-5 w-5 text-muted-foreground transition group-hover:text-info" />
-            {tweet.replyCount && tweet.replyCount > 0 && (
+            {tweet.replies && tweet.replies.length > 0 && (
               <span className="text-xs text-muted-foreground">
-                {tweet.replyCount}
+                {tweet.replies.length}
               </span>
             )}
           </button>
@@ -135,13 +136,13 @@ export function ThreadTweetCard({
           </button>
         </div>
 
-        {hasReplies && tweet.replyCount && tweet.replyCount > 0 && (
+        {hasReplies && (
           <button
             onClick={() => setShowReplies(!showReplies)}
             className="cursor-pointer mt-2 text-xs text-muted-foreground hover:text-foreground transition"
           >
-            {showReplies ? "Hide" : "View"} {tweet.replyCount}{" "}
-            {tweet.replyCount === 1 ? "reply" : "replies"}
+            {showReplies ? "Hide" : "View"} {tweet.replies?.length ?? ""}{" "}
+            {tweet.replies?.length === 1 ? "reply" : "replies"}
           </button>
         )}
 
