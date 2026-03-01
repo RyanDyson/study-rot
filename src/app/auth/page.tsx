@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { Mode, ModeConfig } from "@/config/auth";
 import { AuthContext } from "./components/auth-context";
+import { Dither } from "@/components/Dither";
+import { Iphone } from "@/components/ui/iphone";
 
 export default function AuthPage() {
   const [mode, setMode] = useState<Mode>(Mode.LOGIN);
@@ -18,20 +20,24 @@ export default function AuthPage() {
   return (
     <AuthContext.Provider value={{ mode, setMode, email, setEmail }}>
       <div className="min-w-screen h-screen flex items-center justify-center">
-        <div className="hidden lg:flex items-center w-1/2 h-full  bg-linear-to-br from-primary to-secondary">
-          <div className="-translate-x-32 p-1 bg-neutral-300/90 border-2 backdrop-blur-xl rounded-sm border-neutral-400 flex flex-col items-center justify-center">
-            <div className="w-full gap-x-1 pb-2 pt-1 px-4 items-center justify-end flex">
-              <div className="bg-emerald-200 border border-emerald-500 rounded-full h-3 w-3" />
-              <div className="bg-amber-200 border border-amber-500 rounded-full h-3 w-3" />
-              <div className="bg-red-200 border border-red-500 rounded-full h-3 w-3" />
-            </div>
-            <div className="w-[800px] h-[500px] bg-gray-100 flex items-center justify-center rounded-lg overflow-hidden">
-              {/* <Image
-                src="/preview.png"
-                alt="App Preview"
-                className="w-full h-full object-cover"
-              /> */}
-            </div>
+        <div className="hidden lg:flex items-center justify-center w-1/2 h-full relative overflow-hidden bg-zinc-950">
+          {/* dither background */}
+          <div className="absolute inset-0 z-0 opacity-60">
+            <Dither
+              waveColor={[0.5, 1, 0.7]}
+              disableAnimation={false}
+              enableMouseInteraction
+              mouseRadius={0.3}
+              colorNum={4}
+              waveAmplitude={0.3}
+              waveFrequency={3}
+              waveSpeed={0.05}
+            />
+          </div>
+          <div className="absolute inset-0 z-0 bg-linear-to-b from-zinc-950/40 via-transparent to-zinc-950/70" />
+          {/* phone mockup */}
+          <div className="relative z-10 w-80">
+            <Iphone src="/preview.jpeg" />
           </div>
         </div>
         <div className="relative z-50 md:w-1/2 flex flex-col items-center justify-center gap-6 p-4">
