@@ -10,7 +10,7 @@ const resend = new Resend(env.RESEND_API_KEY);
 const fromEmail = env.RESEND_FROM_EMAIL ?? "onboarding@resend.dev";
 
 export const auth = betterAuth({
-  baseURL: env.BETTER_AUTH_URL,
+  baseURL: process.env.VERCEL_URL ?? env.BETTER_AUTH_URL,
   database: drizzleAdapter(db, {
     provider: "pg",
   }),
