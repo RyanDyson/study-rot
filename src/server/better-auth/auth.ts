@@ -9,8 +9,16 @@ import { db } from "@/server/db";
 const resend = new Resend(env.RESEND_API_KEY);
 const fromEmail = env.RESEND_FROM_EMAIL ?? "onboarding@resend.dev";
 
+function getBaseURL() {
+  // Explicit config always wins (set this in Vercel dashboard to your deployment URL)
+  if (env.BETTER_AUTH_URL) return env.BETTER_AUTH_URL;
+  // VERCEL_URL is injected automatically but without a protocol
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  return "http://localhost:3100";
+}
+
 export const auth = betterAuth({
-  baseURL: process.env.VERCEL_URL ?? env.BETTER_AUTH_URL,
+  baseURL: getBaseURL(),
   database: drizzleAdapter(db, {
     provider: "pg",
   }),
